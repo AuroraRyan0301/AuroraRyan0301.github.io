@@ -9,7 +9,7 @@ title: Hobbies
 Good scientists always have a unique taste in music. Only through music can I feel the dreamlike otherworldliness.
 
 ## Anime
-## Piano & Github
+## Piano & Guitar
 ## HiFi
 ## Coding
 ## Japanese
