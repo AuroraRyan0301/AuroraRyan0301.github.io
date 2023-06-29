@@ -22,4 +22,4 @@ title: Awards
 - Sep 2021 - Sep 2022：National Center for Low-Dimensional Materials Research, You's Lab, Tsinghua University
 - Sep 2022 - June 2023：National Center for Low-Dimensional Materials Research, Ding's Lab, Tsinghua University
 
-Lastest Update: 21th May 2023 &nbsp; [中文 (Chinese Version)](https://auroraryan.github.io/aurora.github.io/blob/main/awards-zh/)
+Lastest Update: 21th May 2023 &nbsp; [中文 (Chinese Version)](https://AuroraRyan0301.github.io/aurora.github.io/blob/main/awards-zh/)
