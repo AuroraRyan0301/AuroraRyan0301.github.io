@@ -4,7 +4,7 @@ layout: page
 
 # About Me
 
-<img src="https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/blob/main/Ryan.jpg" class="floatpic" width="600" height="720">
+<img src="/images/Ryan.jpg" class="floatpic" width="600" height="720">
 
 Here is **Ruihan Yu ([Ryan](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/blob/main/file/余睿涵简历.pdf))**.
 

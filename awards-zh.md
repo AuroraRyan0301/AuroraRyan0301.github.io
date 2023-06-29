@@ -24,4 +24,5 @@ title: Awards-zh
 
 - 2021年9月-2022年9月：清华大学低维材料研究中心，尤力实验室。
 - 2022年9月-2023年6月：清华大学低维材料研究中心，丁世谦实验室。
-更新时间：2023/05/21&nbsp;   [English Version (英文)](https://AuroraRyan0301.github.io/aurora.github.io/blob/main/awards/)
+
+更新时间：2023/05/21&nbsp;   [English Version (英文)](https://AuroraRyan0301.github.io/awards/)
