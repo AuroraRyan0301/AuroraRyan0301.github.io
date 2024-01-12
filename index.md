@@ -4,6 +4,7 @@ layout: page
 
 # About Me
 <img src="/images/Ryan.jpg" class="floatpic" width="600" height="720">
+
 Here is **Ruihan Yu ([Ryan](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/blob/main/file/余睿涵简历.pdf))**.
 I am a master's student in the Physics Department at Tsinghua University, currently pursuing research in two different areas simultaneously. 
 
