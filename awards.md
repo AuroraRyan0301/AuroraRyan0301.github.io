@@ -6,10 +6,10 @@ title: Awards
 
 ## Scholarships
 
-- May 2021：Tsinghua University Social Work Excellence Scholarship.
-- May 2021：Tsinghua University Academic Progress Scholarship.
-- May 2022：Tsinghua University Academic Excellence Scholarship.
-- May 2022：Guangzhou Pharmaceuticals Corporation Scholarship.
+- Oct 2021：Tsinghua University Social Work Excellence Scholarship.
+- Oct 2021：Tsinghua University Academic Progress Scholarship.
+- Oct 2022：Tsinghua University Academic Excellence Scholarship.
+- Oct 2022：Guangzhou Pharmaceuticals Corporation Scholarship.
 
 ## Competitions
 
