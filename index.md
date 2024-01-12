@@ -14,7 +14,7 @@ Additionally, under the guidance of Professor Ding Shiqian, I am conducting rese
 
 With the agreement and support of both supervisors, I have successfully managed to balance and excel in both research areas due to their distinct nature and work content. Looking ahead, my future plan is to pursue a Ph.D. in the field of 3D Vision. 
 
-Here is [my Resume](https://github.com/AuroraRyan/AuroraRyan0301.github.io/blob/main/file/Resume-RyanYu.pdf).
+Here is [my Resume](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/blob/main/file/CV-Yu%20Ruihan_en.pdf).
 
 <br>
 
