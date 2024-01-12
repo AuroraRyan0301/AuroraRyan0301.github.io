@@ -19,9 +19,4 @@ title: Awards
 ## Honors
 - June 2022：Tsinghua University Zijing Four-Star Volunteer
 
-## Services
-
-- Sep 2021 - Sep 2022：National Center for Low-Dimensional Materials Research, You's Lab, Tsinghua University
-- Sep 2022 - June 2023：National Center for Low-Dimensional Materials Research, Ding's Lab, Tsinghua University
-
 Lastest Update: 21th May 2023 &nbsp; [中文 (Chinese Version)](https://auroraryan0301.github.io/awards-zh/)
