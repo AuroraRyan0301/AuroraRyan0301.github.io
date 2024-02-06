@@ -8,11 +8,11 @@ layout: page
 Here is **Ruihan Yu ([Ryan](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/blob/main/file/余睿涵简历.pdf))**.
 I am a master's student in the Physics Department at Tsinghua University, currently pursuing research in two different areas simultaneously. 
 
-Under the supervision of Professor Xu Feng, I am involved in the field of computer vision, specifically focusing on 3D reconstruction and physics-based rendering.
+Under the supervision of Professor Xu Feng, I am involved in the field of physics-based rendering and 3D computer vision, specifically focusing on physics-based differentiable rendering and 3D reconstruction.
 
 Additionally, under the guidance of Professor Ding Shiqian, I am conducting research on atomic nucleus optical clocks and four-wave mixing in the field of physics.
 
-Looking ahead, my future plan is to pursue a Ph.D. in the field of 3D Vision. 
+Looking ahead, my future plan is to pursue a Ph.D. in the field of Graphics or 3D Vision. 
 
 Here is [my Resume](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/blob/main/file/CV-Yu%20Ruihan_en.pdf).
 
