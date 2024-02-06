@@ -12,7 +12,7 @@ Under the supervision of Professor Xu Feng, I am involved in the field of comput
 
 Additionally, under the guidance of Professor Ding Shiqian, I am conducting research on atomic nucleus optical clocks and four-wave mixing in the field of physics.
 
-With the agreement and support of both supervisors, I have successfully managed to balance and excel in both research areas due to their distinct nature and work content. Looking ahead, my future plan is to pursue a Ph.D. in the field of 3D Vision. 
+Looking ahead, my future plan is to pursue a Ph.D. in the field of 3D Vision. 
 
 Here is [my Resume](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/blob/main/file/CV-Yu%20Ruihan_en.pdf).
 
@@ -29,8 +29,8 @@ Here is [my Resume](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/b
 ## Research Interests
 
 - Computer Vision
-- Generative Model
 - Computer Graphics
+- Generative Model
 
 
 
