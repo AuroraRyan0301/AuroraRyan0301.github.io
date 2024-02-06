@@ -32,7 +32,15 @@ Here is [my Resume](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/b
 - Computer Graphics
 - Generative Model
 
+<br>
 
+---
+
+## Skills
+
+- Language: TOEFL：98；JLPT: N2
+- Programming: Python, C/C++, CUDA, latex, Mathematica, Matlab 
+- Framework: Pytorch, Mitsuba3
 
 
 
