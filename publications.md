@@ -7,12 +7,11 @@ title: Publications
 # Publications
 <div style="display:flex; flex-direction:row; margin-bottom:20px;">
   <div style="flex:1; margin-right:20px;">
-    <img src="./teaser/NeRF_emitter.gif" alt="ShadowNeuS">
+    <img src="/teaser/NeRF_emitter.gif" alt="NeRF_emitter">
   </div>
   <div style="flex:2;">
     <h3>
         <a href="https://nerfemitterpbir.github.io/">NeRF-Emitter: NeRF as Non-Distant Environment Emitter in Physics-based Inverse Rendering</a>
-    </h3>
     </h3>
     <p>
     <a href="https://gerwang.github.io/">Jingwang Ling</a>, <b>Ruihan Yu</b>, Feng Xu, Chun Du, Shuang Zhao
