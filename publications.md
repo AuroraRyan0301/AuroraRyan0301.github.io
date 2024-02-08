@@ -5,26 +5,23 @@ title: Publications
 ---
 
 # Publications
-
-## Paper Title 1
-
 <div style="display:flex; flex-direction:row; margin-bottom:20px;">
   <div style="flex:1; margin-right:20px;">
-    ![NeRF_emitter](/images/Ryan.jpg)
+    <img src="./teaser/NeRF_emitter.gif" alt="ShadowNeuS">
   </div>
   <div style="flex:2;">
-    <h3>ShadowNeuS: Neural SDF Reconstruction by Shadow Ray Supervision</h3>
-    
-    - Authors: Jingwang Ling, Zhibo Wang, Feng Xu
-    - Conference: IEEE/CVF International Conference on Computer Vision and Pattern Recognition (CVPR)
-    - Year: 2023
-
-    The essence of NeRF is supervising camera rays. This ray supervision scheme can generalize to shadow rays, enabling neural scene reconstruction from single-view shadows.
-
-    - [Paper](/path/to/paper1.pdf)
-    - [Code](/path/to/code1)
-    - [Project Page](/path/to/project1)
-    - [Video](/path/to/video1)
-    - [Presentation Video](/path/to/presentation1)
+    <h3>
+        <a href="https://nerfemitterpbir.github.io/">NeRF-Emitter: NeRF as Non-Distant Environment Emitter in Physics-based Inverse Rendering</a>
+    </h3>
+    </h3>
+    <p>
+    <a href="https://gerwang.github.io/">Jingwang Ling</a>, <b>Ruihan Yu</b>, Feng Xu, Chun Du, Shuang Zhao
+    </p>
+    <p>
+    arxiv, 2024
+    </p>
+    <p>
+    We propose to use NeRF as a spatially varying environment lighting model and build an inverse rendering pipeline using NeRF as the non-distant environment emitter.
+    </p>
   </div>
 </div>

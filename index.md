@@ -38,7 +38,7 @@ Here is [my Resume](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/b
 
 ## Skills
 
-- Language: TOEFL：98；JLPT: N2
+- Language: TOEFL: 98；JLPT: N2
 - Programming: Python, C/C++, CUDA, Latex, Mathematica, Matlab 
 - Framework: Pytorch, Mitsuba3
 - Tools: Git, Linux, Blender
