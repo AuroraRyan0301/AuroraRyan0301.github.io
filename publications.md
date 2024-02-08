@@ -16,10 +16,8 @@ title: Publications
     <p>
     <a href="https://gerwang.github.io/">Jingwang Ling</a>, <b>Ruihan Yu</b>, Feng Xu, Chun Du, Shuang Zhao
     </p>
-    <p>
     arxiv, 2024
     </p>
-    <p>
     We propose to use NeRF as a spatially varying environment lighting model and build an inverse rendering pipeline using NeRF as the non-distant environment emitter.
     </p>
   </div>
