@@ -13,8 +13,11 @@ title: Publications
     <h3>
         <a href="https://nerfemitterpbir.github.io/">NeRF-Emitter: NeRF as Non-Distant Environment Emitter in Physics-based Inverse Rendering</a>
     </h3>
-    <p><a href="https://gerwang.github.io/">Jingwang Ling</a>, <b>Ruihan Yu</b>, Feng Xu, Chun Du, Shuang Zhao</p>
-    <p>arxiv, 2024</p>
-    <p>We propose to use NeRF as a spatially varying environment lighting model and build an inverse rendering pipeline using NeRF as the non-distant environment emitter.</p>
+    <p>
+    <a href="https://gerwang.github.io/">Jingwang Ling</a>, <b>Ruihan Yu</b>, Feng Xu, Chun Du, Shuang Zhao
+
+    arxiv, 2024
+
+    We propose to use NeRF as a spatially varying environment lighting model and build an inverse rendering pipeline using NeRF as the non-distant environment emitter.</p>
   </div>
 </div>
