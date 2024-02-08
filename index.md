@@ -5,7 +5,7 @@ layout: page
 # About Me
 <img src="/images/Ryan.jpg" class="floatpic" width="600" height="720">
 
-Here is **Ruihan Yu ([Ryan](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/blob/main/file/余睿涵简历.pdf))**.
+Here is **Ruihan Yu ([Ryan](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/blob/main/file/CV_Yu_Ruihan_en.pdf))**.
 I am a master's student in the Physics Department at Tsinghua University, currently pursuing research in two different areas simultaneously. 
 
 Under the supervision of Professor Xu Feng, I am involved in the field of physics-based rendering and 3D computer vision, specifically focusing on physics-based differentiable rendering and 3D reconstruction.
@@ -14,7 +14,7 @@ Additionally, under the guidance of Professor Ding Shiqian, I am conducting rese
 
 Looking ahead, my future plan is to pursue a Ph.D. in the field of rendering or 3D Vision. 
 
-Here is [my Resume](https://github.com/AuroraRyan0301/AuroraRyan0301.github.io/blob/main/file/CV-Yu%20Ruihan_en.pdf).
+Here is [my Resume](/file/CV_Yu_Ruihan_en.pdf).
 
 <br>
 
