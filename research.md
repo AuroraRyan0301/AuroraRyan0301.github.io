@@ -1,10 +1,10 @@
 ---
 layout: page
-permalink: /publications/index.html
-title: Publications
+permalink: /research/index.html
+title: Research
 ---
 
-# Publications
+# Research
 <div style="display:flex; flex-direction:row; margin-bottom:20px;">
   <div style="flex:1; margin-right:20px;">
     <img src="/teaser/NeRF_emitter.gif" alt="NeRF_emitter">
