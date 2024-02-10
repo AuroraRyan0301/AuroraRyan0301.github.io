@@ -8,7 +8,7 @@ layout: page
 Here is **Ruihan Yu ([Ryan](/file/CV_Yu_Ruihan_en.pdf))**.
 I am a master's student in the Physics Department at Tsinghua University, currently pursuing research in two different areas simultaneously. Actually, I consider myself as a 3rd-year undergraduate student.
 
-Under the supervision of Professor Xu Feng, I am involved in the field of physics-based rendering and 3D computer vision, specifically focusing on physics-based differentiable rendering and 3D reconstruction.
+Mainly, under the supervision of Professor Xu Feng, I am involved in the field of physics-based rendering and 3D computer vision, specifically focusing on physics-based differentiable rendering and 3D reconstruction.
 
 Additionally, under the guidance of Professor Ding Shiqian, I am conducting research on atomic nucleus optical clocks and four-wave mixing in the field of physics.
 
