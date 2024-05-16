@@ -18,7 +18,7 @@ Here is [my Resume](/file/CV_Yu_Ruihan_en.pdf).
 
 ## Academic Background
 
-- **Sep 2023 - Now:** Master of Physics, Tsinghua University
+- **Sep 2023 - Now:** PhD of Physics, Tsinghua University
 
 - **Sep 2019 - June 2023:** Bachelor of Mathematics and Physics, Tsinghua University
 
