@@ -745,7 +745,7 @@ sitemap: false
         var sT  = new Float32Array(LIVE_N);
         var alb = new Float32Array(LIVE_N);
         for (var i = 0; i < LIVE_N; i++) {
-          sT[i]  = density[i] * 4.5 + 0.3;
+          sT[i]  = density[i] * 5.0;          // σ_t in [0, 5], touches 0
           alb[i] = albC[i] * 0.75 + 0.15;
         }
         return { density: density, albedoCurve: albC,

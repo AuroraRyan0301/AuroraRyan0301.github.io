@@ -267,6 +267,38 @@ def _paper_drt(sigma_t, albedo, sigma_bar, state, out,
 
 
 @njit(cache=True, fastmath=True)
+def _ff_estimate(sigma_t, albedo, sigma_bar, state, out,
+                 x_min, x_max, dx, N, L_light):
+    """Paper-Eq.11 free-flight estimator (biased at σ_t = 0 cells).
+       Scat: sample y via global delta-tracking; contribute ε(y)/σ(y)·∂σ.
+       Trans: per-segment Eq.5 uniform on [0, t_clamped] (matched SM trans)."""
+    # Free-flight along the full ray for scat
+    t_abs = x_min
+    seg_scat = False
+    for step in range(4096):
+        u = _pcg(state)
+        if u < 1e-10: u = 1e-10
+        t_abs += -math.log(u) / sigma_bar
+        if t_abs >= x_max: break
+        sig = _interp(sigma_t, t_abs, x_min, dx, N)
+        if _pcg(state) < sig / sigma_bar:
+            seg_scat = True
+            break
+
+    if seg_scat:
+        sig_y = _interp(sigma_t, t_abs, x_min, dx, N)
+        eps_y = _interp(albedo, t_abs, x_min, dx, N)
+        if sig_y > 1e-12:
+            _interp_bwd(out, t_abs, L_light * eps_y / sig_y, x_min, dx, N)
+
+    # Trans term (re-uses the same delta-track outcome: t_clamped + h_t)
+    t_clamped = min(t_abs - x_min, x_max - x_min)
+    h_t = _interp(albedo, t_abs, x_min, dx, N) * L_light if seg_scat else L_light
+    s2 = x_min + _pcg(state) * t_clamped
+    _interp_bwd(out, s2, t_clamped * (-h_t), x_min, dx, N)
+
+
+@njit(cache=True, fastmath=True)
 def _grad_one_term(sigma_t, albedo, sigma_bar, state, term, out,
                    x_min, x_max, dx, N, max_bounces, L_light):
     """One-path estimator that accumulates only the scat (term=0) or
@@ -350,6 +382,9 @@ def _variance_pass(sigma_t, albedo, sigma_bar, mode, R, SPP, seed_base,
             elif mode == MODE_DRT:
                 _paper_drt(sigma_t, albedo, sigma_bar, state, one_buf,
                            x_min, x_max, dx, N, max_bounces, L_light, CDF, total)
+            elif mode == MODE_FF:
+                _ff_estimate(sigma_t, albedo, sigma_bar, state, one_buf,
+                             x_min, x_max, dx, N, L_light)
             else:
                 _grad_one(sigma_t, albedo, sigma_bar, state, mode, one_buf,
                           x_min, x_max, dx, N, max_bounces, L_light)
@@ -425,7 +460,8 @@ def random_curve(seed, n=N):
     return y.astype(np.float64)
 
 def make_case(seed):
-    sigma_t = random_curve(seed) * 4.5 + 0.3
+    # σ_t in [0, 5] (touches zero so FF shows its support-mismatch bias)
+    sigma_t = random_curve(seed) * 5.0
     albedo  = random_curve(seed + 1000) * 0.75 + 0.15
     return sigma_t, albedo
 

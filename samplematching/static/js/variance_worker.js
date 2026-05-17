@@ -103,18 +103,6 @@ function gradEstimate(sigmaT, albedo, sigmaBar, rng, mode) {
     if (mode === 'sm') {
       const s = rng() * tClamped;
       s1 = segStart + s; s2 = s1;
-    } else if (mode === 'ff') {
-      const hi = segStart + tClamped;
-      function ffOne() {
-        if (hi <= segStart) return segStart;
-        for (let k = 0; k < 64; k++) {
-          const ss = segStart + rng() * (hi - segStart);
-          if (rng() < interp(sigmaT, ss) / sigmaBar) return ss;
-        }
-        return segStart + 0.5 * (hi - segStart);
-      }
-      s1 = ffOne();
-      s2 = ffOne();
     }
 
     const hs = interp(albedo, s1) * Lnext;
@@ -197,6 +185,37 @@ function paperDrtEstimate(sigmaT, albedo, sigmaBar, rng, cache) {
     const s2 = seg_start + rng() * tClamped;
     interpBwd(grad, s2, tClamped * (-ht));
   }
+  return grad;
+}
+
+/* ---- FF (paper Eq.11): global free-flight, biased only where σ_t = 0 -- */
+function ffEstimate(sigmaT, albedo, sigmaBar, rng) {
+  const grad = new Float64Array(N);
+  // free-flight on [X_MIN, X_MAX] for the scat sample
+  let tAbs = X_MIN;
+  let segScat = false;
+  for (let step = 0; step < 4096; step++) {
+    let u = rng();
+    if (u < 1e-10) u = 1e-10;
+    tAbs += -Math.log(u) / sigmaBar;
+    if (tAbs >= X_MAX) break;
+    if (rng() < interp(sigmaT, tAbs) / sigmaBar) { segScat = true; break; }
+  }
+
+  if (segScat) {
+    const sigY = interp(sigmaT, tAbs);
+    const epsY = interp(albedo,  tAbs);
+    if (sigY > 1e-12) {
+      interpBwd(grad, tAbs, L_LIGHT * epsY / sigY);
+    }
+  }
+
+  // trans term: re-use the same walk's t_clamped
+  const tClamped = Math.min(tAbs - X_MIN, X_MAX - X_MIN);
+  const ht = segScat ? interp(albedo, tAbs) * L_LIGHT : L_LIGHT;
+  const s2 = X_MIN + rng() * tClamped;
+  interpBwd(grad, s2, tClamped * (-ht));
+
   return grad;
 }
 
@@ -291,6 +310,7 @@ self.addEventListener('message', (e) => {
         let g;
         if      (mode === 'nm' ) g = twoPathEstimate(sigmaT, albedo, sigmaBar, rng);
         else if (mode === 'drt') g = paperDrtEstimate(sigmaT, albedo, sigmaBar, rng, drtCache);
+        else if (mode === 'ff' ) g = ffEstimate      (sigmaT, albedo, sigmaBar, rng);
         else                     g = gradEstimate    (sigmaT, albedo, sigmaBar, rng, mode);
         for (let i = 0; i < N; i++) sppAvg[i] += g[i];
       }
