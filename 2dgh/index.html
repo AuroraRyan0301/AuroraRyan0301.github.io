@@ -19,6 +19,78 @@ sitemap: false
     .teaser__media { aspect-ratio: 1878 / 837; background:#f4efe9; border-radius:8px; overflow:hidden; }
     .teaser__media img { width:100%; height:100%; object-fit: contain; }
     .figgrid img { background:#fff; }
+
+    /* ---- (m,n) basis pattern explorer ----------------------------------- */
+    .basis {
+      max-width: 50rem; margin: 0 auto;
+      background: #fff; border: 1px solid rgba(75,51,38,0.10);
+      border-radius: 12px; padding: 1.4rem 1.6rem 1.6rem;
+      box-shadow: 0 2px 12px rgba(75,51,38,0.05);
+    }
+    .basis__title { font-family: var(--font-serif); font-weight:700; font-size:1.05rem; margin-bottom:0.25rem; }
+    .basis__formula {
+      font-size: 0.9rem; color: var(--color-muted); margin-bottom: 1rem;
+      font-style: italic;
+    }
+    .basis__stage {
+      display: grid;
+      grid-template-columns: 1fr 56px;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .basis__canvas-wrap {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: #111;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 1px rgba(75,51,38,0.10);
+    }
+    .basis__canvas-wrap canvas { width:100%; height:100%; display:block; image-rendering: auto; }
+    .basis__axis-label {
+      position: absolute; left: 8px; top: 8px;
+      font-family: var(--font-serif); font-style: italic;
+      font-size: 0.95rem; color: rgba(255,255,255,0.85);
+      letter-spacing: 0.02em;
+    }
+    .basis__cbar {
+      position: relative;
+      display: grid; grid-template-rows: 1fr;
+    }
+    .basis__cbar canvas {
+      width: 22px; height: 100%;
+      border-radius: 4px;
+      box-shadow: inset 0 0 0 1px rgba(75,51,38,0.12);
+      display: block;
+    }
+    .basis__cbar-ticks {
+      position: absolute; left: 30px; top: 0; bottom: 0;
+      display: flex; flex-direction: column; justify-content: space-between;
+      font-family: var(--font-mono); font-size: 0.72rem; color: var(--color-muted);
+      pointer-events: none;
+    }
+    .basis__cbar-ticks span { line-height: 1; }
+    .basis__controls {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.5rem;
+      margin-top: 1.1rem; align-items: center; font-size: 0.92rem;
+    }
+    .basis__controls .ctl { display: flex; align-items: center; gap: 0.6rem; }
+    .basis__controls .ctl span.lbl {
+      font-family: var(--font-serif); font-style: italic;
+      color: var(--color-heading); font-size: 1rem; width: 1.4rem;
+    }
+    .basis__controls .ctl span.val {
+      font-family: var(--font-mono); color: var(--color-accent);
+      font-weight: 700; min-width: 1rem;
+    }
+    .basis__controls input[type=range] { flex: 1; accent-color: var(--color-accent); }
+    .basis__caption {
+      margin-top: 0.9rem; font-size: 0.85rem; color: var(--color-muted);
+      text-align: center; font-style: italic;
+    }
+    @media (max-width: 560px) {
+      .basis__controls { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -123,6 +195,54 @@ sitemap: false
           </figcaption>
         </figure>
       </div>
+
+      <div class="prose" style="margin: 2.5rem auto 1.4rem;">
+        <p>
+          Where does that extra representational power come from? The Gaussian-Hermite primitive is
+          the Gaussian multiplied by a 2D Hermite polynomial of rank <em>(m,&nbsp;n)</em>. Slide
+          <em>m</em> and <em>n</em> below to watch the basis pattern unfold &mdash; new lobes appear
+          along each axis, alternating in sign.
+        </p>
+      </div>
+
+      <div class="basis" id="basis">
+        <div class="basis__title">Gaussian-Hermite basis  <span style="color:var(--color-muted);font-weight:400;">&nbsp;ψ<sub>m,n</sub>(x,&thinsp;y)</span></div>
+        <div class="basis__formula">ψ<sub>m,n</sub>(x,&thinsp;y) &nbsp;=&nbsp; H<sub>m</sub>(x) &middot; H<sub>n</sub>(y) &middot; exp(−(x² + y²) / 2)</div>
+
+        <div class="basis__stage">
+          <div class="basis__canvas-wrap">
+            <canvas id="basisCanvas" width="384" height="384"></canvas>
+            <span class="basis__axis-label" id="basisLabel">ψ<sub>0,0</sub></span>
+          </div>
+          <div class="basis__cbar">
+            <canvas id="basisCbar" width="22" height="384"></canvas>
+            <div class="basis__cbar-ticks">
+              <span>+1</span>
+              <span>0</span>
+              <span>−1</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="basis__controls">
+          <label class="ctl">
+            <span class="lbl">m</span>
+            <input type="range" id="mRng" min="0" max="5" step="1" value="0">
+            <span class="val" id="mVal">0</span>
+          </label>
+          <label class="ctl">
+            <span class="lbl">n</span>
+            <input type="range" id="nRng" min="0" max="5" step="1" value="0">
+            <span class="val" id="nVal">0</span>
+          </label>
+        </div>
+
+        <p class="basis__caption">
+          Values are normalised per pattern so the colour scale always spans &minus;1 &hellip; &plus;1.
+          Rank&nbsp;(0,&thinsp;0) recovers the plain Gaussian; higher rank adds oscillating
+          lobes that let the primitive carve sharper, more anisotropic shapes.
+        </p>
+      </div>
     </section>
 
     <section id="results" class="sect sect--frag-inner">
@@ -152,22 +272,6 @@ sitemap: false
             per-pixel error against ground truth. 2DGH has noticeably less residual energy on edges.
           </figcaption>
         </figure>
-        <figure>
-          <img src="{{ '/2dgh/static/images/normal.png' | relative_url }}"
-               alt="Normal-map comparison on MipNeRF360 bonsai and garden">
-          <figcaption>
-            Surface normals on <em>bonsai</em> and <em>garden</em> &mdash; sharper edges translate to
-            cleaner normal maps without rolling-off the silhouette.
-          </figcaption>
-        </figure>
-        <figure>
-          <img src="{{ '/2dgh/static/images/dtu.png' | relative_url }}"
-               alt="DTU geometry reconstruction error">
-          <figcaption>
-            DTU geometry reconstruction error (lower is better) &mdash; consistent improvements on
-            thin-structure regions across multiple scans.
-          </figcaption>
-        </figure>
       </div>
     </section>
 
@@ -189,6 +293,128 @@ sitemap: false
   <footer class="site-footer">
     <p>&copy; 2025 Ruihan Yu &nbsp;&middot;&nbsp; <a href="{{ '/' | relative_url }}">Back to homepage</a></p>
   </footer>
+
+  <script>
+    (function () {
+      // ---- Physicists' Hermite polynomials via recurrence ----------------
+      function H(n, x) {
+        if (n === 0) return 1;
+        if (n === 1) return 2 * x;
+        let h0 = 1, h1 = 2 * x;
+        for (let k = 1; k < n; k++) {
+          const h2 = 2 * x * h1 - 2 * k * h0;
+          h0 = h1; h1 = h2;
+        }
+        return h1;
+      }
+      function psi(m, n, x, y) {
+        return H(m, x) * H(n, y) * Math.exp(-(x * x + y * y) / 2);
+      }
+
+      // ---- Diverging colormap: deep teal -> cream -> warm rust ----------
+      // Anchors hand-tuned for a calm, paper-figure palette (perceptual feel,
+      // not perceptually uniform — we lean on the brand palette).
+      const STOPS = [
+        { t: -1.00, c: [ 31,  61,  93] },  // deep petrol
+        { t: -0.65, c: [ 79, 122, 156] },
+        { t: -0.30, c: [173, 197, 213] },
+        { t:  0.00, c: [248, 244, 236] },  // cream (matches site frag-l)
+        { t:  0.30, c: [221, 178, 138] },
+        { t:  0.65, c: [180, 102,  64] },
+        { t:  1.00, c: [126,  50,  38] },  // brick rust
+      ];
+      function cmap(t) {
+        if (t <= STOPS[0].t) return STOPS[0].c;
+        for (let i = 0; i < STOPS.length - 1; i++) {
+          const a = STOPS[i], b = STOPS[i + 1];
+          if (t <= b.t) {
+            const u = (t - a.t) / (b.t - a.t);
+            return [
+              Math.round(a.c[0] * (1 - u) + b.c[0] * u),
+              Math.round(a.c[1] * (1 - u) + b.c[1] * u),
+              Math.round(a.c[2] * (1 - u) + b.c[2] * u),
+            ];
+          }
+        }
+        return STOPS[STOPS.length - 1].c;
+      }
+
+      // ---- DOM refs ------------------------------------------------------
+      const canvas = document.getElementById('basisCanvas');
+      const cbar   = document.getElementById('basisCbar');
+      const mRng   = document.getElementById('mRng');
+      const nRng   = document.getElementById('nRng');
+      const mVal   = document.getElementById('mVal');
+      const nVal   = document.getElementById('nVal');
+      const label  = document.getElementById('basisLabel');
+
+      // ---- Render the colorbar once -------------------------------------
+      (function drawCbar() {
+        const ctx = cbar.getContext('2d');
+        const W = cbar.width, Hb = cbar.height;
+        const img = ctx.createImageData(W, Hb);
+        for (let j = 0; j < Hb; j++) {
+          // Top = +1, bottom = -1
+          const t = 1 - 2 * (j / (Hb - 1));
+          const [r, g, b] = cmap(t);
+          for (let i = 0; i < W; i++) {
+            const k = 4 * (j * W + i);
+            img.data[k    ] = r;
+            img.data[k + 1] = g;
+            img.data[k + 2] = b;
+            img.data[k + 3] = 255;
+          }
+        }
+        ctx.putImageData(img, 0, 0);
+      })();
+
+      // ---- Render the basis pattern -------------------------------------
+      function drawPattern() {
+        const m = parseInt(mRng.value, 10);
+        const n = parseInt(nRng.value, 10);
+        mVal.textContent = m;
+        nVal.textContent = n;
+        label.innerHTML = 'ψ<sub>' + m + ',' + n + '</sub>';
+
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, Hc = canvas.height;
+        const img = ctx.createImageData(W, Hc);
+
+        // Sample on [-range, +range] x [-range, +range].  Slight stretch for
+        // higher orders so the outer lobes stay inside the frame.
+        const range = 3.0 + 0.18 * Math.max(m, n);
+
+        const vals = new Float32Array(W * Hc);
+        let vmax = 0;
+        for (let j = 0; j < Hc; j++) {
+          const y = -range + 2 * range * j / (Hc - 1);
+          for (let i = 0; i < W; i++) {
+            const x = -range + 2 * range * i / (W - 1);
+            const v = psi(m, n, x, y);
+            vals[j * W + i] = v;
+            const a = Math.abs(v);
+            if (a > vmax) vmax = a;
+          }
+        }
+        if (vmax < 1e-12) vmax = 1;
+
+        for (let k = 0; k < W * Hc; k++) {
+          const t = Math.max(-1, Math.min(1, vals[k] / vmax));
+          const [r, g, b] = cmap(t);
+          const o = 4 * k;
+          img.data[o    ] = r;
+          img.data[o + 1] = g;
+          img.data[o + 2] = b;
+          img.data[o + 3] = 255;
+        }
+        ctx.putImageData(img, 0, 0);
+      }
+
+      mRng.addEventListener('input', drawPattern);
+      nRng.addEventListener('input', drawPattern);
+      drawPattern();
+    })();
+  </script>
 
 </body>
 </html>
