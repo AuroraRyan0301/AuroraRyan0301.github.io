@@ -47,6 +47,8 @@ sitemap: false
     .toy__title { font-family: var(--font-serif); font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem; }
     .toy__hint  { font-size: 0.85rem; color: var(--color-muted); margin-bottom: 1rem; }
     .toy__stage { width: 100%; height: 220px; }
+    .toy--phys { background: #fbfaf6; }
+    .phys__stage { width: 100%; height: 290px; display: block; }
     .toy__controls {
       display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center;
       margin: 0.8rem 0 0.4rem; font-size: 0.88rem;
@@ -100,6 +102,7 @@ sitemap: false
       <a class="topbar__brand" href="{{ '/' | relative_url }}">&larr; Ruihan Yu</a>
       <nav class="topbar__nav">
         <a href="#abstract">Abstract</a>
+        <a href="#intuition">Intuition</a>
         <a href="#toy">Toy</a>
         <a href="#video">Video</a>
         <a href="#bibtex">BibTeX</a>
@@ -187,6 +190,51 @@ sitemap: false
           volumetric path-integral estimator already yields a large variance
           reduction.
         </p>
+      </div>
+    </section>
+
+    <section id="intuition" class="sect">
+      <h2 class="subhead">Why two opposite-sign terms?</h2>
+      <div class="prose" style="margin-bottom: 1.3rem;">
+        <p>
+          Nudging the medium denser at one point does two things at once: it
+          <em>blocks more</em> of the <strong style="color:#d96b6b;">red,
+          in-line background</strong> radiance the camera was already seeing,
+          and it <em>scatters more</em> of the
+          <strong style="color:#5286b5;">blue, off-axis</strong> radiance into
+          the same outgoing ray. The density gradient is the sum of those two
+          radiances &mdash; one with a minus sign, one with a plus sign. Drag
+          σ<sub>t</sub> below to watch the trade-off.
+        </p>
+      </div>
+
+      <div class="toy toy--phys" id="physToy">
+        <svg class="phys__stage" id="physStage" viewBox="0 0 720 320" aria-hidden="true"></svg>
+
+        <div class="toy__controls">
+          <label class="row" style="flex:1;">
+            <span style="font-style:italic;font-family:var(--font-serif);font-size:1.05rem;">σ<sub>t</sub></span>
+            <input type="range" id="sigmaRng" min="0" max="1000" value="180" style="flex:1;">
+            <span style="font-size:0.78rem;color:var(--color-muted);min-width:5.5rem;text-align:right;">
+              <span id="sigmaLow">low</span> &nbsp;⟶&nbsp; <span id="sigmaHigh">high</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="toy__readout">
+          <div class="cell" style="background:rgba(217,107,107,0.12);">
+            Background transmission&nbsp;<small>(red, &minus; sign)</small>
+            <strong id="redOut" style="color:#b94a4a;">1.00</strong>
+          </div>
+          <div class="cell" style="background:rgba(82,134,181,0.12);">
+            Off-axis in-scattering&nbsp;<small>(blue, + sign)</small>
+            <strong id="blueOut" style="color:#2f6ea3;">0.00</strong>
+          </div>
+          <div class="cell">
+            Camera radiance&nbsp;<small>(what it sees)</small>
+            <strong id="camOut">1.00</strong>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -449,6 +497,163 @@ sitemap: false
         vmNum.textContent = vm.toExponential(2);
         vdNum.textContent = vd.toExponential(2);
       });
+    })();
+
+    // ====== Physical-intuition slider toy ============================
+    (function () {
+      const svg     = document.getElementById('physStage');
+      const sigRng  = document.getElementById('sigmaRng');
+      const redOut  = document.getElementById('redOut');
+      const blueOut = document.getElementById('blueOut');
+      const camOut  = document.getElementById('camOut');
+      if (!svg) return;
+
+      const ns = 'http://www.w3.org/2000/svg';
+      const C_RED  = '#d96b6b';
+      const C_BLUE = '#5286b5';
+      const C_TEXT = '#36393d';
+      const C_DIM  = '#7a8189';
+
+      function el(tag, attrs) {
+        const e = document.createElementNS(ns, tag);
+        for (const k in attrs) e.setAttribute(k, attrs[k]);
+        return e;
+      }
+
+      // Layout (in SVG units, 720 x 320)
+      const camX = 110, camY = 175;
+      const boxC = { x: 380, y: 175 }, boxW = 100;
+      const redLightX = 620, redLightY = 175;
+      const blueLightX = 560, blueLightY = 60;
+
+      // --- Static (background) elements ---
+      // Box
+      const box = el('rect', {
+        x: boxC.x - boxW/2, y: boxC.y - boxW/2,
+        width: boxW, height: boxW,
+        rx: 4, stroke: '#cbd0d6', 'stroke-width': 1.5, fill: '#36393d', 'fill-opacity': 0.18
+      });
+      svg.appendChild(box);
+
+      // Camera icon (simple)
+      const cam = el('g', {});
+      cam.appendChild(el('rect', { x: camX-26, y: camY-14, width: 36, height: 28, rx: 4,
+                                   fill: 'none', stroke: C_TEXT, 'stroke-width': 1.8 }));
+      cam.appendChild(el('rect', { x: camX-10, y: camY-20, width: 12, height: 8,
+                                   fill: 'none', stroke: C_TEXT, 'stroke-width': 1.5 }));
+      cam.appendChild(el('circle', { cx: camX-6, cy: camY, r: 6,
+                                     fill: C_DIM, stroke: C_TEXT, 'stroke-width': 1.5 }));
+      svg.appendChild(cam);
+
+      // Light icon (used for both)
+      function lightAt(x, y, color) {
+        const g = el('g', {});
+        const r = 11;
+        // rays
+        for (let k = 0; k < 8; k++) {
+          const a = k * Math.PI / 4;
+          g.appendChild(el('line', {
+            x1: x + Math.cos(a) * (r + 4), y1: y + Math.sin(a) * (r + 4),
+            x2: x + Math.cos(a) * (r + 12), y2: y + Math.sin(a) * (r + 12),
+            stroke: color, 'stroke-width': 2.2, 'stroke-linecap': 'round'
+          }));
+        }
+        g.appendChild(el('circle', { cx: x, cy: y, r,
+                                     fill: color, 'fill-opacity': 0.55,
+                                     stroke: color, 'stroke-width': 2 }));
+        return g;
+      }
+      svg.appendChild(lightAt(redLightX, redLightY, C_RED));
+      svg.appendChild(lightAt(blueLightX, blueLightY, C_BLUE));
+
+      // Trunk (camera -> box left edge): the in-line radiance the camera sees
+      const trunk = el('line', {
+        x1: camX + 12, y1: camY, x2: boxC.x - boxW/2, y2: boxC.y,
+        stroke: C_RED, 'stroke-width': 6, 'stroke-linecap': 'round'
+      });
+      svg.appendChild(trunk);
+
+      // Red ray (box right edge -> red light): background transmission segment
+      const redRay = el('line', {
+        x1: boxC.x + boxW/2, y1: boxC.y, x2: redLightX - 18, y2: redLightY,
+        stroke: C_RED, 'stroke-width': 6, 'stroke-linecap': 'round'
+      });
+      svg.appendChild(redRay);
+
+      // Blue ray (box top-right -> blue light): off-axis in-scattering
+      // Compute direction from box center to blue light
+      const blueDx = blueLightX - boxC.x;
+      const blueDy = blueLightY - boxC.y;
+      const blueLen = Math.hypot(blueDx, blueDy);
+      const bux = blueDx / blueLen, buy = blueDy / blueLen;
+      // Ray exits box from a point on the right/top edge in the blue direction
+      // (simplified: from box center, offset to edge along normal)
+      const edgeOffset = boxW / 2 * 0.95;
+      const blueStartX = boxC.x + bux * edgeOffset;
+      const blueStartY = boxC.y + buy * edgeOffset;
+      const blueEndX = blueLightX - bux * 18;
+      const blueEndY = blueLightY - buy * 18;
+      const blueRay = el('line', {
+        x1: blueStartX, y1: blueStartY, x2: blueEndX, y2: blueEndY,
+        stroke: C_BLUE, 'stroke-width': 6, 'stroke-linecap': 'round',
+        opacity: 0.25
+      });
+      svg.appendChild(blueRay);
+
+      // Vertex dot at box center (on top of rays)
+      const vertex = el('circle', { cx: boxC.x, cy: boxC.y, r: 6,
+                                    fill: '#1a1a1a', stroke: '#fff', 'stroke-width': 1.2 });
+      svg.appendChild(vertex);
+
+      // Title text above
+      const ttl = el('text', { x: 360, y: 30,
+        'text-anchor': 'middle', fill: C_TEXT, 'font-family': 'serif',
+        'font-style': 'italic', 'font-size': 16 });
+      ttl.textContent = 'denser σₜ  ⇒  less red transmission, more blue scattering';
+      svg.appendChild(ttl);
+
+      // --- Color interpolation helper (hex to rgb) ---
+      function hexToRgb(h) {
+        const x = parseInt(h.slice(1), 16);
+        return [(x >> 16) & 255, (x >> 8) & 255, x & 255];
+      }
+      const RED_RGB  = hexToRgb(C_RED);
+      const BLUE_RGB = hexToRgb(C_BLUE);
+      function mix(a, b, t) {
+        return `rgb(${Math.round(a[0]*(1-t)+b[0]*t)},${Math.round(a[1]*(1-t)+b[1]*t)},${Math.round(a[2]*(1-t)+b[2]*t)})`;
+      }
+
+      function update() {
+        // σ_t in [0, 1]
+        const s = parseInt(sigRng.value, 10) / 1000;
+        // Box opacity goes from 0.10 (very thin) to 0.85 (very dense)
+        box.setAttribute('fill-opacity', (0.10 + s * 0.75).toFixed(3));
+
+        // Background transmission ~ exp(-σ_t * thickness).  We assume unit thickness
+        // and pick a scale factor so the slider sweeps from ~1.0 to ~0.18.
+        const transmission = Math.exp(-1.7 * s);
+        // In-scattering grows roughly linearly with σ_t (under the diffusion picture),
+        // saturating as the medium becomes opaque (path-integrated).
+        const scatter = (1 - Math.exp(-1.7 * s)) * 0.9;
+
+        // Update readouts
+        redOut.textContent  = transmission.toFixed(2);
+        blueOut.textContent = scatter.toFixed(2);
+        camOut.textContent  = (transmission + scatter).toFixed(2);
+
+        // Trunk colour: red when transmission dominates, blue when scattering dominates.
+        // Mixing weight = scatter / (transmission + scatter)
+        const mixT = scatter / (transmission + scatter + 1e-6);
+        trunk.setAttribute('stroke', mix(RED_RGB, BLUE_RGB, mixT));
+        trunk.setAttribute('stroke-width', (4 + 3 * Math.max(transmission, scatter)).toFixed(1));
+
+        // Red ray: opacity scales with transmission
+        redRay.setAttribute('opacity', (0.2 + 0.8 * transmission).toFixed(3));
+        // Blue ray: opacity scales with scatter
+        blueRay.setAttribute('opacity', (0.2 + 0.8 * scatter).toFixed(3));
+      }
+      sigRng.addEventListener('input', update);
+      update();
     })();
   </script>
 </body>
