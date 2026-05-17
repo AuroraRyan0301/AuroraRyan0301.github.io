@@ -379,29 +379,35 @@ sitemap: false
 
             <figure class="strat">
               <svg viewBox="0 0 200 108">
-                <!-- (a) Free flight: scat PDF ∝ σ_t T, hill on segment (biased) -->
-                <path d="M40 44 C 60 44, 70 16, 95 14 C 120 16, 130 36, 150 44 L40 44 Z"
+                <!-- (a) Free flight: scat PDF ∝ σ_t T on [x_{j-1}, x_j^⊥];
+                     the free-flight sample IS x_j itself. -->
+                <path d="M40 44 C 55 44, 65 18, 90 16 C 115 18, 135 35, 160 44 C 175 47, 182 48, 185 48 L40 48 Z"
                       fill="#5286b5" fill-opacity="0.30"/>
-                <line x1="40" y1="48" x2="150" y2="48" stroke="#888" stroke-width="1.6"/>
-                <circle cx="40" cy="48" r="2.4" fill="#444"/>
-                <circle cx="150" cy="48" r="2.4" fill="#444"/>
-                <circle cx="92" cy="48" r="4.2" fill="#5286b5" stroke="#2f4f70" stroke-width="1"/>
+                <line x1="40"  y1="48" x2="150" y2="48" stroke="#888" stroke-width="1.6"/>
+                <line x1="150" y1="48" x2="185" y2="48" stroke="#a06bb8" stroke-width="1.4"
+                      stroke-dasharray="3 3"/>
+                <circle cx="40"  cy="48" r="2.4" fill="#444"/>
+                <circle cx="185" cy="48" r="2.4" fill="#a06bb8"/>
+                <!-- scattering probe coincides with x_j (the free-flight result) -->
+                <circle cx="150" cy="48" r="4.5" fill="#5286b5" stroke="#2f4f70" stroke-width="1"/>
 
                 <line x1="40" y1="78" x2="150" y2="78" stroke="#888" stroke-width="1.6"/>
-                <circle cx="40" cy="78" r="2.4" fill="#444"/>
+                <circle cx="40"  cy="78" r="2.4" fill="#444"/>
                 <circle cx="150" cy="78" r="2.4" fill="#444"/>
-                <circle cx="64" cy="78" r="4.2" fill="#d96b6b" stroke="#7d3a3a" stroke-width="1"/>
+                <circle cx="64"  cy="78" r="4.2" fill="#d96b6b" stroke="#7d3a3a" stroke-width="1"/>
 
                 <text x="40"  y="96" font-size="8" text-anchor="middle" fill="#777"
                       font-style="italic">x<tspan font-size="6" dy="2">j−1</tspan></text>
                 <text x="150" y="96" font-size="8" text-anchor="middle" fill="#777"
                       font-style="italic">x<tspan font-size="6" dy="2">j</tspan></text>
+                <text x="185" y="96" font-size="8" text-anchor="middle" fill="#a06bb8"
+                      font-style="italic">x<tspan font-size="6" dy="2">j</tspan><tspan font-size="6" dy="-4">⊥</tspan></text>
                 <text x="3" y="50" font-size="7" fill="#2f4f70">scat</text>
                 <text x="3" y="80" font-size="7" fill="#7d3a3a">trans</text>
               </svg>
               <figcaption>
                 <strong>Free flight</strong>
-                <span>\(p_{\mathrm{scat}}(y) \propto \sigma_t(y)\,T(y)\) &nbsp;(biased)</span>
+                <span>\(p_{\mathrm{scat}}(y) \propto \sigma_t(y)\,T(y)\)<br>on \([x_{j-1},\,x_j^{\bot}]\) &nbsp;(biased)</span>
               </figcaption>
             </figure>
 
