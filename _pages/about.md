@@ -66,8 +66,11 @@ redirect_from:
       <div class="pub__body">
         <h3 class="pub__title">Sample Matching for Joint Extinction Gradient Estimation in Differentiable Volume Rendering</h3>
         <p class="pub__authors">
-          <span class="me">Ruihan Yu</span>, Yu-Chen Wang, Jingwang Ling,
-          Feng Xu, Shuang Zhao
+          {% include author.html id="ruihan_yu" me=true %},
+          {% include author.html id="yu_chen_wang" %},
+          {% include author.html id="jingwang_ling" %},
+          {% include author.html id="feng_xu" %},
+          {% include author.html id="shuang_zhao" %}
         </p>
         <p class="pub__venue">ACM Transactions on Graphics (TOG), 2026</p>
         <p class="pub__award">
@@ -89,9 +92,15 @@ redirect_from:
       <div class="pub__body">
         <h3 class="pub__title">Generative World Renderer</h3>
         <p class="pub__authors">
-          Zheng-Hui Huang, Zhixiang Wang, Jiaming Tan,
-          <span class="me">Ruihan Yu</span>, Yidan Zhang, Bo Zheng,
-          Yu-Lun Liu, Yung-Yu Chuang, Kaipeng Zhang
+          {% include author.html id="zheng_hui_huang" %},
+          {% include author.html id="zhixiang_wang" %},
+          {% include author.html id="jiaming_tan" %},
+          {% include author.html id="ruihan_yu" me=true %},
+          {% include author.html id="yidan_zhang" %},
+          {% include author.html id="bo_zheng" %},
+          {% include author.html id="yu_lun_liu" %},
+          {% include author.html id="yung_yu_chuang" %},
+          {% include author.html id="kaipeng_zhang" %}
         </p>
         <p class="pub__venue">arXiv preprint, 2026</p>
         <p class="pub__links">
@@ -108,7 +117,10 @@ redirect_from:
       <div class="pub__body">
         <h3 class="pub__title">2DGH: 2D Gaussian-Hermite Splatting for High-quality Rendering and Better Geometry Features</h3>
         <p class="pub__authors">
-          <span class="me">Ruihan Yu</span>*, Tianyu Huang*, Jingwang Ling, Feng Xu
+          {% include author.html id="ruihan_yu" me=true eq=true %},
+          {% include author.html id="tianyu_huang" eq=true %},
+          {% include author.html id="jingwang_ling" %},
+          {% include author.html id="feng_xu" %}
         </p>
         <p class="pub__venue">IEEE Transactions on Visualization and Computer Graphics (TVCG), 2025</p>
         <p class="pub__links">
@@ -127,8 +139,11 @@ redirect_from:
       <div class="pub__body">
         <h3 class="pub__title">NeRF as a Non-Distant Environment Emitter in Physics-based Inverse Rendering</h3>
         <p class="pub__authors">
-          Jingwang Ling, <span class="me">Ruihan Yu</span>, Feng Xu,
-          Chun Du, Shuang Zhao
+          {% include author.html id="jingwang_ling" %},
+          {% include author.html id="ruihan_yu" me=true %},
+          {% include author.html id="feng_xu" %},
+          {% include author.html id="chun_du" %},
+          {% include author.html id="shuang_zhao" %}
         </p>
         <p class="pub__venue">ACM SIGGRAPH 2024 (Conference Track)</p>
         <p class="pub__links">

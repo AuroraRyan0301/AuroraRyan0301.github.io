@@ -117,10 +117,10 @@ sitemap: false
       </h1>
 
       <p class="hero__authors">
-        <a class="me" href="{{ '/' | relative_url }}">Ruihan Yu</a><sup>1,*</sup> &middot;
-        Tianyu Huang<sup>2,*</sup> &middot;
-        Jingwang Ling<sup>2</sup> &middot;
-        Feng Xu<sup>2,&dagger;</sup>
+        {% include author.html id="ruihan_yu" me=true sup="1,*" %} &middot;
+        {% include author.html id="tianyu_huang" sup="2,*" %} &middot;
+        {% include author.html id="jingwang_ling" sup="2" %} &middot;
+        {% include author.html id="feng_xu" sup="2,&dagger;" %}
       </p>
       <p class="hero__affil">
         <sup>1</sup>Department of Physics, Tsinghua University &nbsp;&nbsp;

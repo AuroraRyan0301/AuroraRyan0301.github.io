@@ -1,18 +1,42 @@
-# Authors
+# Central author registry — used by `_includes/author.html`.
+# Add a new collaborator here once and every publication line picks them up.
+# If `url` is omitted the include falls back to plain text (no link).
 
-Name Name:
-  name        : "Name Name"
-  uri         : "https://name.com"
-  email       : "name@name.com"
-  bio         : "This is the first name."
-  avatar      : "bio-photo-2.jpg"
-  twitter     : "name"
-  google_plus : "Name"
-
-Name2 Name2:
-  name        : "Name2 Name2"
-  email       : "name2@name2.com"
-  bio         : "I ordered what?"
-  avatar      : "bio-photo.jpg"
-  twitter     : "name2"
-  google_plus : "Name"
+ruihan_yu:
+  name: "Ruihan Yu"
+  url: "/"
+yu_chen_wang:
+  name: "Yu-Chen Wang"
+  url: "https://bulbaberry.xyz/about/"
+jingwang_ling:
+  name: "Jingwang Ling"
+  url: "https://gerwang.github.io/"
+feng_xu:
+  name: "Feng Xu"
+  url: "http://xufeng.site/"
+shuang_zhao:
+  name: "Shuang Zhao"
+  url: "https://shuangz.com/"
+tianyu_huang:
+  name: "Tianyu Huang"
+  url: "https://illumiart.net/"
+zheng_hui_huang:
+  name: "Zheng-Hui Huang"
+zhixiang_wang:
+  name: "Zhixiang Wang"
+  url: "https://lightchaserx.github.io/"
+jiaming_tan:
+  name: "Jiaming Tan"
+yidan_zhang:
+  name: "Yidan Zhang"
+bo_zheng:
+  name: "Bo Zheng"
+yu_lun_liu:
+  name: "Yu-Lun Liu"
+yung_yu_chuang:
+  name: "Yung-Yu Chuang"
+kaipeng_zhang:
+  name: "Kaipeng Zhang"
+  url: "https://kpzhang93.github.io/"
+chun_du:
+  name: "Chun Du"

@@ -1,0 +1,19 @@
+{%- comment -%}
+  Render an author name as a (possibly linked) inline span.
+    id  — required, key into _data/authors.yml
+    me  — true to mark as the site author (adds .me class, links to /)
+    eq  — true to append "*" (equal-contribution marker)
+    sup — optional superscript text (affiliation number, dagger, etc.)
+  Usage:
+    {% include author.html id="tianyu_huang" eq=true sup="1" %}
+{%- endcomment -%}
+{%- assign a = site.data.authors[include.id] -%}
+{%- if include.me -%}
+<a class="me" href="{{ '/' | relative_url }}">{{ a.name }}</a>
+{%- elsif a.url -%}
+<a href="{{ a.url }}">{{ a.name }}</a>
+{%- else -%}
+{{ a.name }}
+{%- endif -%}
+{%- if include.eq %}<sup>*</sup>{% endif -%}
+{%- if include.sup %}<sup>{{ include.sup }}</sup>{% endif -%}
