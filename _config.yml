@@ -17,66 +17,13 @@ url                      : https://auroraryan0301.github.io
 baseurl                  : ""
 repository               : "AuroraRyan0301/AuroraRyan0301.github.io"
 
-# Site Author - sidebar info
+# Site Author — kept minimal; the home layout does not render a sidebar.
 author:
   avatar           : "profile.png"
   name             : "Ruihan Yu"
-  pronouns         : # e.g. "she/her"
-  bio              : "M2 student, Umetani Lab, The University of Tokyo. Differentiable / physics-based rendering."
-  location         : "Tokyo, Japan"
-  employer         : "The University of Tokyo"
-  uri              : "https://auroraryan0301.github.io"
-  email            : # add your preferred contact email
+  email            : "ruihan.yu@shanda.com"
 
-  # Academic websites
-  academia         : # URL
-  arxiv            : # URL
-  googlescholar    : # URL — add your Google Scholar profile when you have one
-  inspire-hep      : # URL
-  impactstory      : # URL
-  orcid            : # URL
-  semantic         : # URL
-  ssrn             : # URL
-  pubmed           : # URL
-  researchgate     : # URL
-  scopus           : # URL
-  zotero           : # URL
-
-
-  # Repositories and software development
-  bitbucket        : # Username
-  codepen          : # Username
-  dribbble         : # Username
-  github           : "AuroraRyan0301"
-  kaggle           : # Username  
-  stackoverflow    : # User number or user number and name (i.e., use "1" or "1/jeff-atwood")    
-
-  # Social media
-  artstation       : # Username
-  bluesky          : "bsky.app" # Replace this with you Bluesky username
-  facebook         : # Username
-  flickr           : # Username
-  foursquare       : # Username
-  goodreads        : # Username
-  google_plus      : # Username
-  keybase          : # Username
-  instagram        : # Username
-  lastfm           : # Username
-  linkedin         : # Username
-  mastodon         : # URL
-  medium           : # URL
-  pinterest        : # Username
-  soundcloud       : # Username
-  steam            : # Username
-  telegram         : # URL
-  tumblr           : # Username
-  twitter          : # Username for X / Twitter
-  vine             : # Username
-  weibo            : # Username
-  wikipedia        : # Username
-  xing             : # Username
-  youtube          : # Username
-  zhihu            : # Username
+  # All other author fields intentionally omitted — homepage shows email only.
 
 # Publication Category - The following the list of publication categories and their headings
 publication_category:

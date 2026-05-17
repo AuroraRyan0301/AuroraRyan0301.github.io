@@ -1,0 +1,194 @@
+---
+# Front-matter required so Jekyll processes this with Sass.
+---
+
+/* ----------------------------------------------------------------------------
+ * Personal homepage — rshi.top-inspired palette + typography.
+ * ------------------------------------------------------------------------- */
+
+:root {
+  --color-text: #4b3326;
+  --color-muted: #6b7280;
+  --color-accent: #99583d;
+  --color-heading: #36393d;
+  --color-bg: #ffffff;
+  --color-frag: #dfdace30;
+  --color-frag-l: #fffdfa;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+               sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-serif: "Libre Caslon Text", ui-serif, Georgia, Cambria,
+                "Times New Roman", Times, serif;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body { margin: 0; }
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease;
+}
+
+a:hover { border-bottom-color: var(--color-accent); }
+
+h1, h2, h3, h4 {
+  color: var(--color-heading);
+  margin: 0;
+  font-weight: 700;
+}
+
+p { margin: 0 0 0.85rem 0; }
+
+.page {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ---- Section scaffolding (mirrors rshi.top sect-lane / sect-box) -------- */
+
+.sect-lane { width: 100%; padding: 3rem 0; }
+.sect-lane--frag { background: var(--color-frag); }
+.sect-lane:first-of-type { padding-top: 4.5rem; }
+
+.subhead {
+  font-family: var(--font-serif);
+  text-align: center;
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  padding: 0.5rem 0 2rem 0;
+  letter-spacing: 0.01em;
+}
+
+/* ---- Hero: About text on the left, photo on the right ------------------ */
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.hero__text { min-width: 0; text-align: justify; }
+
+.hero__name {
+  font-family: var(--font-serif);
+  font-size: 2.5rem;
+  line-height: 1.15;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  letter-spacing: 0.005em;
+}
+
+.hero__tagline {
+  font-size: 1rem;
+  color: var(--color-muted);
+  margin-bottom: 1.4rem;
+  font-style: italic;
+}
+
+.hero__bio p { font-size: 1rem; line-height: 1.7; }
+.hero__bio strong { font-weight: 600; color: var(--color-heading); }
+
+.hero__contact {
+  margin-top: 1.4rem;
+  font-style: italic;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.hero__photo {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.hero__photo img {
+  width: 100%;
+  max-width: 18rem;
+  height: auto;
+  border-radius: 0.5rem;
+  box-shadow: 0 6px 24px rgba(75, 51, 38, 0.10);
+}
+
+/* ---- Publications list (rshi-style paragraph blocks) ------------------- */
+
+.pub-list { padding-top: 0.5rem; }
+
+.pub {
+  display: grid;
+  grid-template-columns: 1fr 2.4fr;
+  gap: 2rem;
+  padding: 1.25rem 0;
+  border-top: 1px solid rgba(75, 51, 38, 0.12);
+}
+
+.pub:last-child { border-bottom: 1px solid rgba(75, 51, 38, 0.12); }
+
+.pub__thumb img {
+  width: 100%;
+  height: auto;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(75, 51, 38, 0.08);
+}
+
+.pub__body { min-width: 0; }
+
+.pub__title {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  line-height: 1.4;
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.pub__authors {
+  font-size: 0.92rem;
+  color: var(--color-muted);
+  margin-bottom: 0.25rem;
+}
+
+.pub__venue {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--color-text);
+  margin-bottom: 0.5rem;
+}
+
+.pub__links { font-size: 0.9rem; }
+.pub__links a + a { margin-left: 0.6rem; }
+.pub__links a::before { content: "·"; margin-right: 0.6rem; color: var(--color-muted); }
+.pub__links a:first-child::before { content: ""; margin-right: 0; }
+
+/* ---- Footer ------------------------------------------------------------- */
+
+.site-footer {
+  text-align: center;
+  padding: 2rem 0 3rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+/* ---- Responsive --------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .hero { grid-template-columns: 1fr; gap: 1.5rem; }
+  .hero__photo { order: -1; }
+  .hero__photo img { max-width: 12rem; }
+  .pub { grid-template-columns: 1fr; gap: 0.75rem; }
+  .pub__thumb img { max-width: 14rem; }
+  .hero__name { font-size: 2rem; }
+}
