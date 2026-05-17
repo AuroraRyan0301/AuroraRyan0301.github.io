@@ -18,14 +18,13 @@ sitemap: false
   <style>
     /* Aspect-ratio reservation so first paint shows the full teaser / video. */
     .teaser__media {
-      aspect-ratio: 4 / 3;
+      aspect-ratio: 1955 / 313;
       background: #111;
       border-radius: 8px;
       overflow: hidden;
-      max-width: 36rem;
       margin: 0 auto;
     }
-    .teaser__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .teaser__media img { width: 100%; height: 100%; object-fit: contain; display: block; }
     .teaser__video {
       aspect-ratio: 16 / 9;
       background: #111;
@@ -146,9 +145,9 @@ sitemap: false
     <section class="teaser">
       <figure>
         <div class="teaser__media">
-          <img src="{{ '/samplematching/static/images/teaser.jpg' | relative_url }}"
-               width="1920" height="1440"
-               alt="Teaser: Ours reconstruction vs error heatmap on a heterogeneous medium">
+          <img src="{{ '/samplematching/static/images/teaser.png' | relative_url }}"
+               width="1955" height="313"
+               alt="Paper teaser: DRT vs Reference vs Ours, with error heatmap inset">
         </div>
         <figcaption>
           A single shared probe per segment (Ours) reduces gradient variance by up to 80% over DRT on the same compute budget.
