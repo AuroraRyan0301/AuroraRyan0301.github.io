@@ -31,9 +31,10 @@ redirect_from:
         </p>
         <p>
           My long-term goal is to build faithful <strong>digital twins</strong> of
-          the real world &mdash; representations that we can not only render and
-          reconstruct, but also <em>act on</em> to understand and feed back into
-          the physical world. I work on
+          the real world (you can call them <em>world models</em>, of course
+          &mdash; a term that is kind of abused today) &mdash; representations we
+          can not only render and reconstruct, but also <em>act on</em> to
+          understand and feed back into the physical world. I work on
           <strong>physics-based / differentiable rendering</strong> and
           <strong>neural scene representations</strong>, and I'm broadly interested
           in <strong>simulation</strong> and <strong>robotics</strong>.
