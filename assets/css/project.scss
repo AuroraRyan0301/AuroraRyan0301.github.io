@@ -121,7 +121,8 @@ section.sect--frag-inner {
 /* ---- Best-paper award (plain text + soft-rainbow flowing gradient) ---- */
 
 .award {
-  display: inline-flex;
+  display: flex;
+  justify-content: center;
   align-items: baseline;
   gap: 0.4rem;
   margin: 0.2rem 0 0.9rem;
