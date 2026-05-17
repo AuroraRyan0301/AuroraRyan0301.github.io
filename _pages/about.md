@@ -30,11 +30,17 @@ redirect_from:
           at UC San Diego.
         </p>
         <p>
-          My work spans <strong>physics-based / differentiable rendering</strong>,
-          <strong>neural scene representations</strong>, and broader
-          <strong>3D vision</strong> problems &mdash; designing estimators
-          and systems that reconstruct cleaner, more physically meaningful
-          scenes.
+          My long-term goal is to build faithful <strong>digital twins</strong> of
+          the real world &mdash; representations that we can not only render and
+          reconstruct, but also <em>act on</em> to understand and feed back into
+          the physical world. I work on
+          <strong>physics-based / differentiable rendering</strong> and
+          <strong>neural scene representations</strong>, and I'm broadly interested
+          in <strong>simulation</strong> and <strong>robotics</strong>.
+        </p>
+        <p>
+          <strong>I am currently looking for a PhD position</strong>
+          &mdash; please feel free to reach out.
         </p>
       </div>
       <p class="hero__contact">
