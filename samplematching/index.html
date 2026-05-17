@@ -159,18 +159,33 @@ sitemap: false
       <h2 class="subhead">TL;DR</h2>
       <div class="prose">
         <p>
-          The extinction gradient splits into a <em>scattering</em> term (evaluated at a path vertex)
-          and a <em>transmittance</em> term (integrated along the segment). The two share the same
-          field, enter the gradient with <em>opposite signs</em>, and are therefore naturally
-          <em>negatively correlated</em> when sampled at the same location &mdash; yet every existing
-          estimator samples them at uncorrelated positions, foreclosing that correlation.
+          We model the <strong>extinction (density) gradient</strong> as the
+          <em>difference between two in-scattering radiances</em> along the path.
+          That mirrors what the physics is doing: nudging density at a point
+          <em>adds</em> in-scattering and <em>attenuates</em> background
+          transmission, so the gradient is naturally the sum of two terms with
+          opposite signs.
         </p>
         <p>
-          We propose <strong>sample matching</strong>: evaluate both at a single shared probe by
-          reformulating the per-segment integrand as a joint distribution on a triangular support.
-          The resulting unbiased Monte Carlo estimator reduces gradient variance by up to
-          <strong>80%</strong> over DRT, with faster convergence and cleaner reconstructions of
-          heterogeneous participating media.
+          Existing unbiased estimators never couple these two terms &mdash; they
+          evaluate the scattering and transmittance contributions at
+          <em>different</em> points along the segment, so the cancellation that
+          should reduce variance becomes pure noise instead.
+        </p>
+        <p>
+          Coupling them is non-trivial because the two terms live on
+          <em>different integration domains</em>. A short derivation built on
+          <strong>Fubini's theorem</strong> and the definition of
+          <strong>transmittance</strong> is enough to put both terms on a
+          <em>shared domain</em>, so they can be evaluated at the same probe.
+          Once they share a sample location, their opposite-sign correlation
+          collapses much of the variance.
+        </p>
+        <p>
+          In practice this is a near drop-in: even without the most-tuned
+          codepath, a <strong>handful of lines</strong> on top of an existing
+          volumetric path-integral estimator already yields a large variance
+          reduction.
         </p>
       </div>
     </section>
