@@ -21,7 +21,7 @@ repository               : "AuroraRyan0301/AuroraRyan0301.github.io"
 author:
   avatar           : "profile.png"
   name             : "Ruihan Yu"
-  email            : "ruihan.yu@shanda.com"
+  email            : "auroraryan0301@gmail.com"
 
   # All other author fields intentionally omitted — homepage shows email only.
 
@@ -162,29 +162,14 @@ kramdown:
   enable_coderay: false
 
 
-# Collections — keep only publications.
-collections:
-  publications:
-    output: true
-    permalink: /:collection/:path/
-
-
-# Defaults — only _pages and _publications.
+# Defaults — every page uses the minimal `home` layout. No collections.
 defaults:
   - scope:
       path: ""
       type: pages
     values:
-      layout: single
-      author_profile: true
-  - scope:
-      path: ""
-      type: publications
-    values:
-      layout: single
-      author_profile: true
-      share: false
-      comments: false
+      layout: home
+      author_profile: false
 
 
 # Sass/SCSS

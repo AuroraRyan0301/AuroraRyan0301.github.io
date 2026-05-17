@@ -57,6 +57,54 @@ p { margin: 0 0 0.85rem 0; }
   padding: 0 1.5rem;
 }
 
+/* ---- Top nav bar (haolin-lu style: brand left, link list right) -------- */
+
+.topbar {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(180%) blur(10px);
+  -webkit-backdrop-filter: saturate(180%) blur(10px);
+  border-bottom: 1px solid rgba(75, 51, 38, 0.07);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar__inner {
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.topbar__brand {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  letter-spacing: 0.01em;
+}
+
+.topbar__brand:hover { border-bottom: none; color: var(--color-accent); }
+
+.topbar__nav {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.92rem;
+}
+
+.topbar__nav a {
+  color: var(--color-text);
+  border-bottom: 1px solid transparent;
+}
+
+.topbar__nav a:hover { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+
+html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
+
 /* ---- Section scaffolding (mirrors rshi.top sect-lane / sect-box) -------- */
 
 .sect-lane { width: 100%; padding: 3rem 0; }
@@ -222,6 +270,20 @@ p { margin: 0 0 0.85rem 0; }
   color: #fff;
   border-color: var(--color-accent);
 }
+
+/* ---- 404 ---------------------------------------------------------------- */
+
+.notfound { padding: 6rem 0 5rem; text-align: center; }
+.notfound__code {
+  font-family: var(--font-serif);
+  font-size: 5rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--color-heading);
+  margin-bottom: 0.5rem;
+}
+.notfound__msg { font-size: 1.1rem; color: var(--color-muted); margin-bottom: 1.6rem; }
+.notfound__back a { font-size: 1rem; }
 
 /* ---- Footer ------------------------------------------------------------- */
 

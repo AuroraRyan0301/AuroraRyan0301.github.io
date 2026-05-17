@@ -8,7 +8,7 @@ redirect_from:
   - /about.html
 ---
 
-<section class="sect-lane">
+<section id="about" class="sect-lane">
   <div class="hero">
     <div class="hero__text">
       <h1 class="hero__name">Ruihan Yu <span style="font-weight:400;color:var(--color-muted);font-size:1.4rem;">Ryan</span></h1>
@@ -35,7 +35,7 @@ redirect_from:
         </p>
       </div>
       <p class="hero__contact">
-        email&nbsp;&nbsp;ruihan dot yu at shanda dot com
+        email&nbsp;&nbsp;auroraryan0301 at gmail dot com
       </p>
     </div>
     <div class="hero__photo">
@@ -44,7 +44,7 @@ redirect_from:
   </div>
 </section>
 
-<section class="sect-lane sect-lane--frag">
+<section id="publications" class="sect-lane sect-lane--frag">
   <h2 class="subhead">Selected Publications</h2>
   <div class="pub-list">
 
