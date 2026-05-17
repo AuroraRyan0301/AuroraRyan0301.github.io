@@ -104,6 +104,7 @@ redirect_from:
         </p>
         <p class="pub__venue">arXiv preprint, 2026</p>
         <p class="pub__links">
+          <a href="https://alaya-studio.github.io/renderer/">project page</a>
           <a href="https://arxiv.org/abs/2604.02329">arXiv</a>
           <a href="https://github.com/ShandaAI/AlayaRenderer">code (AlayaRenderer)</a>
         </p>
