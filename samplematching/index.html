@@ -260,8 +260,8 @@ sitemap: false
       </p>
 
       <div class="btn-row">
-        <a class="btn btn--disabled" aria-disabled="true">Paper (soon)</a>
-        <a class="btn btn--disabled" aria-disabled="true">Supplementary (soon)</a>
+        <a class="btn" href="{{ '/samplematching/static/papers/sample_matching_paper.pdf' | relative_url }}">Paper</a>
+        <a class="btn" href="{{ '/samplematching/static/papers/sample_matching_supplementary.pdf' | relative_url }}">Supplementary</a>
         <a class="btn btn--disabled" aria-disabled="true">arXiv (soon)</a>
         <a class="btn btn--disabled" aria-disabled="true">Code (soon)</a>
       </div>
@@ -761,8 +761,10 @@ sitemap: false
       function renderLive(msg) {
         if (activeCase !== 3) return;  // stale message from a cancelled run
         lastLive = msg;
+        // Exclude FF from the color scale — its 1/σ blow-up near σ≈0 would otherwise
+        // dominate the colorbar and wash out the SM/DRT/NM strips.
         var vmax = Math.max(maxArr(msg.var_sm), maxArr(msg.var_drt),
-                            maxArr(msg.var_nm), maxArr(msg.var_ff), 1e-12);
+                            maxArr(msg.var_nm), 1e-12);
         drawStrip(stripSM,  msg.var_sm,  vmax);
         drawStrip(stripDRT, msg.var_drt, vmax);
         drawStrip(stripNM,  msg.var_nm,  vmax);
@@ -823,7 +825,16 @@ sitemap: false
       }
 
       fetch(url).then(function (r) { return r.json(); })
-                .then(function (d) { data = d; render(); })
+                .then(function (d) {
+                  // Recompute each case's vmax excluding FF (FF blows up near σ≈0 cells
+                  // and would otherwise dominate the colorbar for SM/DRT/NM).
+                  for (var i = 0; i < d.cases.length; i++) {
+                    var cc = d.cases[i];
+                    cc.vmax = Math.max(maxArr(cc.var_sm), maxArr(cc.var_drt),
+                                       maxArr(cc.var_nm), 1e-12);
+                  }
+                  data = d; render();
+                })
                 .catch(function (err) { console.warn('variance data fetch failed', err); });
 
       caseRow.addEventListener('click', function (e) {
