@@ -16,15 +16,18 @@ redirect_from:
       <div class="hero__bio">
         <p>
           I am an <strong>M2 student</strong> in
-          <a href="https://www-ui.is.s.u-tokyo.ac.jp/~ume/">Umetani Lab</a>
+          <a href="https://cgenglab.github.io/en/"><strong>Umetani Lab</strong></a>
           at <strong>The University of Tokyo</strong>.
         </p>
         <p>
-          I am fortunate to collaborate with Prof. <strong>Feng Xu</strong>
-          (Tsinghua University) and Prof. <strong>Shuang Zhao</strong>
+          I am fortunate to collaborate with Prof.
+          <a href="http://xufeng.site/"><strong>Feng Xu</strong></a>
+          (Tsinghua University) and Prof.
+          <a href="https://shuangz.com/"><strong>Shuang Zhao</strong></a>
           (University of Illinois Urbana-Champaign), and to have had a
-          wonderful internship under Prof. <strong>Hao Su</strong> at
-          UC San Diego.
+          wonderful internship under Prof.
+          <a href="https://www.haosu.ai/"><strong>Hao Su</strong></a>
+          at UC San Diego.
         </p>
         <p>
           My work spans <strong>physics-based / differentiable rendering</strong>,
