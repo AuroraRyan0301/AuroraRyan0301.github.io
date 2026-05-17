@@ -39,6 +39,20 @@ sitemap: false
       margin: 0 auto;
     }
     .teaser__media img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    .teaser__cta {
+      text-align: center; margin-top: 0.9rem; margin-bottom: 0;
+      font-size: 0.95rem; font-style: italic;
+    }
+    .teaser__cta a { color: var(--color-accent); text-decoration: none; }
+    .teaser__cta a:hover { text-decoration: underline; }
+    .teaser__cta .arrow {
+      display: inline-block; margin-left: 0.25rem;
+      animation: teaserBob 1.4s ease-in-out infinite;
+    }
+    @keyframes teaserBob {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(3px); }
+    }
     .teaser__video {
       aspect-ratio: 16 / 9;
       background: #111;
@@ -287,6 +301,9 @@ sitemap: false
           A single shared probe per segment (Ours) reduces gradient variance by up to 80% over DRT on the same compute budget.
         </figcaption>
       </figure>
+      <p class="teaser__cta">
+        <a href="#toy">Live, in-browser demo of our method below &mdash; scroll on and try it<span class="arrow" aria-hidden="true">&nbsp;&darr;</span></a>
+      </p>
     </section>
 
     <section id="abstract" class="sect sect--frag-inner">
