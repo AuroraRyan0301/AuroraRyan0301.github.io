@@ -249,21 +249,14 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 }
 
 .pub__award {
-  display: inline-block;
-  margin-left: 0.4rem;
-  padding: 0.08rem 0.6rem 0.12rem;
-  font-size: 0.74rem;
-  font-weight: 600;
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.88rem;
+  font-weight: 500;
   font-style: normal;
-  letter-spacing: 0.02em;
-  color: #8a6526;
-  background: #fbf2d5;
-  border: 1px solid #d4b66a;
-  border-radius: 999px;
-  vertical-align: 2px;
-  white-space: nowrap;
+  color: #c8541e;
 }
-.pub__award::before { content: "★ "; color: #b8923a; }
+.pub__award::before { content: "★ "; }
 
 .pub__links {
   display: flex;

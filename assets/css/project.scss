@@ -118,7 +118,7 @@ section.sect--frag-inner {
   margin-bottom: 0.5rem;
 }
 
-/* ---- Best-paper award badge (warm gold + flourishes) ------------------ */
+/* ---- Best-paper award badge (orange highlight + flourishes) ----------- */
 
 .award-wrap {
   display: inline-block;
@@ -130,29 +130,29 @@ section.sect--frag-inner {
   align-items: center;
   gap: 0.75rem;
   padding: 0.42rem 1.25rem 0.48rem;
-  color: #8a6526;
-  background: #fbf2d5;
-  border: 1px solid #d4b66a;
+  color: #c8541e;
+  background: #ffeedb;
+  border: 1px solid #e8a87c;
   border-radius: 999px;
   font-size: 0.94rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   line-height: 1;
-  box-shadow: 0 1px 2px rgba(138, 101, 38, 0.10);
+  box-shadow: 0 1px 2px rgba(200, 84, 30, 0.10);
 }
 .award__flourish {
-  color: #c9a05a;
+  color: #d97c4f;
   font-size: 1.18rem;
   font-weight: 400;
   line-height: 1;
 }
-.award__star  { color: #b8923a; font-size: 1.02rem; }
+.award__star  { color: #e0651a; font-size: 1.02rem; }
 .award__sub {
   display: block;
   margin-top: 0.42rem;
   font-size: 0.74rem;
-  color: #b8923a;
+  color: #c8541e;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
