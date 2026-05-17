@@ -182,6 +182,14 @@ sitemap: false
       color: #fff;
       border-color: var(--color-accent);
     }
+    .ctrl-icon {
+      width: 0.62rem; height: 0.62rem;
+      display: block;
+      fill: currentColor;
+    }
+    #startBtn .ctrl-icon--stop { display: none; }
+    #startBtn.running .ctrl-icon--play { display: none; }
+    #startBtn.running .ctrl-icon--stop { display: block; }
     .vbox__curves canvas, .vbox__strip canvas {
       width: 100%; height: auto;
       background: #1a1a1f; border-radius: 4px;
@@ -367,10 +375,10 @@ sitemap: false
           <div class="vbox__head">
             <span class="vbox__title">Per-cell variance, \(N{=}128\) grid, 128 spp</span>
             <div class="vbox__cases" id="vboxCases" role="tablist">
-              <button data-case="0" class="active">case 1</button>
+              <button data-case="0">case 1</button>
               <button data-case="1">case 2</button>
               <button data-case="2">case 3</button>
-              <button data-case="3">case N <span style="opacity:0.7;font-size:0.9em;">(live)</span></button>
+              <button data-case="3" class="active">case N <span style="opacity:0.7;font-size:0.9em;">(live)</span></button>
             </div>
           </div>
 
@@ -509,7 +517,7 @@ sitemap: false
           <div class="vbox__curves">
             <div class="vbox__row-controls">
               <button id="randomSceneBtn" type="button" title="Generate a fresh random density / albedo">🎲</button>
-              <button id="startBtn"       type="button" title="Start / stop streaming variance estimates">▶</button>
+              <button id="startBtn"       type="button" title="Start / stop streaming variance estimates" aria-label="Start"><svg class="ctrl-icon ctrl-icon--play"  viewBox="0 0 10 10" aria-hidden="true"><polygon points="3,2 3,8 8,5"/></svg><svg class="ctrl-icon ctrl-icon--stop" viewBox="0 0 10 10" aria-hidden="true"><rect x="3" y="3" width="4" height="4"/></svg></button>
               <span class="vbox__row-label">scene</span>
             </div>
             <canvas id="curvesCanvas" width="720" height="74"></canvas>
@@ -686,7 +694,7 @@ sitemap: false
       }
 
       let data = null;
-      let activeCase = 0;
+      let activeCase = 3;
 
       /* ---- live (Case N) state ----------------------------------------- */
       var scene = null;          // {density, albedoCurve, sigmaT, albedo, seed}
@@ -701,7 +709,7 @@ sitemap: false
       function syncControlsVisibility() {
         controlsCell.classList.toggle('live', activeCase === 3);
       }
-      syncControlsVisibility();   // initial state: case 1, controls hidden
+      syncControlsVisibility();   // initial state: Case N, controls visible
       var LIVE_N    = 256;
       var LIVE_R    = 2560;      // hard cap (user can ■ stop earlier)
       var LIVE_SPP  = 32;
@@ -782,8 +790,8 @@ sitemap: false
 
       function setRunning(on) {
         running = on;
-        startBtn.textContent = on ? '■' : '▶';
         startBtn.classList.toggle('running', on);
+        startBtn.setAttribute('aria-label', on ? 'Stop' : 'Start');
       }
 
       function initWorker() {
@@ -836,6 +844,12 @@ sitemap: false
                   data = d; render();
                 })
                 .catch(function (err) { console.warn('variance data fetch failed', err); });
+
+      // Seed an initial random scene so Case N shows curves immediately on first paint.
+      scene = newScene((Math.random() * 1e9) | 0);
+      drawCurves(scene.density, scene.albedoCurve);
+      clearStrips();
+      statusEl.textContent = 'ready · click ▶';
 
       caseRow.addEventListener('click', function (e) {
         if (e.target.tagName !== 'BUTTON' && e.target.parentElement.tagName !== 'BUTTON') return;
