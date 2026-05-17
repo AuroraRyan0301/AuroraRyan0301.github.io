@@ -118,6 +118,20 @@ section.sect--frag-inner {
   margin-bottom: 0.5rem;
 }
 
+.award {
+  display: inline-block;
+  margin: 0.4rem 0 0;
+  padding: 0.22rem 0.85rem 0.26rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #8a6526;
+  background: #fbf2d5;
+  border: 1px solid #d4b66a;
+  border-radius: 999px;
+}
+.award::before { content: "★ "; color: #b8923a; }
+
 /* ---- Hero -------------------------------------------------------------- */
 
 .hero {

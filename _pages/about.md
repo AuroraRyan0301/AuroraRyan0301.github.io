@@ -69,7 +69,10 @@ redirect_from:
           <span class="me">Ruihan Yu</span>, Yu-Chen Wang, Jingwang Ling,
           Feng Xu, Shuang Zhao
         </p>
-        <p class="pub__venue">ACM Transactions on Graphics (TOG), 2026</p>
+        <p class="pub__venue">
+          ACM Transactions on Graphics (TOG), 2026
+          <span class="pub__award" title="Honorable Mention, Best Papers Award">Honorable Mention, Best Papers Award</span>
+        </p>
         <p class="pub__links">
           <a href="{{ '/samplematching/' | relative_url }}">project page</a>
           <a href="#">paper (soon)</a>
