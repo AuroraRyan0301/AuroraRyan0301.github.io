@@ -286,6 +286,13 @@ sitemap: false
             scattering term, path 2 only the transmittance. Each path is
             unbiased for its own term, so the sum is still unbiased, but no
             correlation survives between scat and trans.</li>
+          <li><strong>Free flight (biased)</strong>: same path as DRT, but
+            within the segment <em>s</em> is rejection-sampled ∝ σ<sub>t</sub>(<em>s</em>)
+            instead of going through the delta-tracking <em>t</em><sub>clamped</sub>
+            (which is ∝ T(<em>s</em>)). Cells with σ<sub>t</sub> ≈ 0 are
+            <em>never</em> sampled &mdash; this estimator is biased; the
+            variance strip still shows the spatial pattern, just with black
+            "dead zones" where the bias lives.</li>
         </ul>
       </div>
 
@@ -320,6 +327,10 @@ sitemap: false
           <div class="vbox__strip">
             <span class="vbox__row-label">Sample not matched</span>
             <canvas class="vbox__strip-canvas" id="stripNM" width="720" height="22"></canvas>
+          </div>
+          <div class="vbox__strip">
+            <span class="vbox__row-label">Free flight (biased)</span>
+            <canvas class="vbox__strip-canvas" id="stripFF" width="720" height="22"></canvas>
           </div>
 
           <div class="vbox__cbar">
@@ -369,6 +380,7 @@ sitemap: false
       const stripSM  = document.getElementById('stripSM');
       const stripDRT = document.getElementById('stripDRT');
       const stripNM  = document.getElementById('stripNM');
+      const stripFF  = document.getElementById('stripFF');
       const curves  = document.getElementById('curvesCanvas');
       const cbar    = document.getElementById('cbarCanvas');
       const caseRow = document.getElementById('vboxCases');
@@ -479,6 +491,7 @@ sitemap: false
         drawStrip(stripSM,  c.var_sm,  c.vmax);
         drawStrip(stripDRT, c.var_drt, c.vmax);
         drawStrip(stripNM,  c.var_nm,  c.vmax);
+        drawStrip(stripFF,  c.var_ff,  c.vmax);
       }
 
       fetch(url).then(r => r.json()).then(d => { data = d; render(); })

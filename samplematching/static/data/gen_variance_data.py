@@ -181,6 +181,22 @@ def gradient_estimate(sigma_t, albedo, sigma_bar, rng, mode):
         elif mode == 'drt':
             s1 = seg_start + rng.random() * t_clamped
             s2 = seg_start + rng.random() * t_clamped
+        elif mode == 'ff':
+            # Free-flight sampling: rejection-sample s ∝ σ_t(s) inside
+            # [seg_start, seg_start + t_clamped].  Biased (cells with σ_t≈0
+            # never get hit), but we only care about the variance pattern.
+            def ff_one():
+                hi = seg_start + t_clamped
+                lo = seg_start
+                if hi <= lo:
+                    return lo
+                for _ in range(64):
+                    s = lo + rng.random() * (hi - lo)
+                    if rng.random() < interp(sigma_t, s) / sigma_bar:
+                        return s
+                return lo + 0.5 * (hi - lo)  # fallback
+            s1 = ff_one()
+            s2 = ff_one()
         else:
             raise ValueError(mode)
 
@@ -331,7 +347,7 @@ def main():
             "gt":      gt.tolist(),
         }
 
-        for mode in ("sm", "drt", "nm"):
+        for mode in ("sm", "drt", "nm", "ff"):
             print(f"  running {mode.upper()}  ({R} reps × {SPP} spp) ...")
             var = per_cell_variance(sigma_t, albedo, sigma_bar, mode,
                                     seed_base=10_000 * (c + 1) + hash(mode) % 997)
@@ -341,7 +357,8 @@ def main():
         # shared colormap max so all strips compare visually
         case["vmax"] = max(max(case["var_sm"]),
                            max(case["var_drt"]),
-                           max(case["var_nm"]))
+                           max(case["var_nm"]),
+                           max(case["var_ff"]))
         out_cases.append(case)
 
     out = {"N": N, "x_min": X_MIN, "x_max": X_MAX,
