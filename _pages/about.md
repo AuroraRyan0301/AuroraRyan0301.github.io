@@ -33,11 +33,10 @@ redirect_from:
           at UC San Diego.
         </p>
         <p>
-          My long-term goal is to build faithful <strong>digital twins</strong> of
-          the real world (you can call them <em>world models</em>, of course
-          &mdash; a term that is kind of abused today) &mdash; representations we
-          can not only render and reconstruct, but also <em>act on</em> to
-          understand and feed back into the physical world. I work on
+          My long-term goal is to build faithful <strong>world models</strong>
+          (of course, a term that is kind of abused today) &mdash; some kind of
+          representations we can not only render and reconstruct, but also
+          <em>act on</em> to understand and feed back into the physical world. I work on
           <strong>video models</strong>, <strong>3D generation</strong>,
           <strong>physics-based / differentiable rendering</strong>, and
           <strong>neural scene representations</strong>, and I'm broadly interested
