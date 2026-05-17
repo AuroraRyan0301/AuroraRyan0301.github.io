@@ -81,8 +81,10 @@ redirect_from:
         </p>
         <p class="pub__links">
           <a href="{{ '/samplematching/' | relative_url }}">project page</a>
-          <a href="#">paper (soon)</a>
+          <a href="{{ '/samplematching/static/papers/sample_matching_paper.pdf' | relative_url }}">paper</a>
+          <a href="{{ '/samplematching/static/papers/sample_matching_supplementary.pdf' | relative_url }}">supplementary</a>
           <a href="#">code (soon)</a>
+          <a href="#">dataset (soon)</a>
         </p>
       </div>
     </article>
