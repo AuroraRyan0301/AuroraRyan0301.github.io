@@ -153,6 +153,9 @@ sitemap: false
       display: flex; flex-direction: column; align-items: flex-end;
       gap: 0.25rem;
     }
+    /* random / start buttons are hidden unless the live case is active */
+    .vbox__row-controls button { display: none; }
+    .vbox__row-controls.live button { display: inline-block; }
     .vbox__row-controls button {
       font-size: 0.72rem;
       padding: 0.18rem 0.7rem;
@@ -683,6 +686,12 @@ sitemap: false
       var statusEl = document.getElementById('liveStatus');
       var randomBtn = document.getElementById('randomSceneBtn');
       var startBtn  = document.getElementById('startBtn');
+      var controlsCell = randomBtn.parentElement;
+
+      function syncControlsVisibility() {
+        controlsCell.classList.toggle('live', activeCase === 3);
+      }
+      syncControlsVisibility();   // initial state: case 1, controls hidden
       var LIVE_N    = 256;
       var LIVE_R    = 2560;      // hard cap (user can ■ stop earlier)
       var LIVE_SPP  = 32;
@@ -819,6 +828,7 @@ sitemap: false
           setRunning(false);
           statusEl.textContent = '';
         }
+        syncControlsVisibility();
         render();
       });
 
@@ -830,6 +840,7 @@ sitemap: false
         for (var i = 0; i < caseRow.children.length; i++) caseRow.children[i].classList.remove('active');
         caseRow.querySelector('[data-case="3"]').classList.add('active');
         activeCase = 3;
+        syncControlsVisibility();
         scene = newScene((Math.random() * 1e9) | 0);
         lastLive = null;
         drawCurves(scene.density, scene.albedoCurve);
