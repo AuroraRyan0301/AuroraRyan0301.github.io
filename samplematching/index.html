@@ -69,27 +69,65 @@ sitemap: false
     .toy__readout .cell strong { display: block; font-family: var(--font-mono); font-size: 1.05rem; margin-top: 0.1rem; color: var(--color-heading); }
     .toy__readout .cell.scat strong { color: #2f6ea3; }
     .toy__readout .cell.trans strong { color: #b94a4a; }
-    .toy__variance { margin-top: 1rem; }
-    .toy__variance button {
-      display: inline-block;
-      padding: 0.4rem 0.95rem;
-      font-size: 0.86rem;
-      color: var(--color-accent);
+    /* ---- Grid-variance comparison ---------------------------------------- */
+    .vbox { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid rgba(75,51,38,0.08); }
+    .vbox__head {
+      display: flex; justify-content: space-between; align-items: baseline;
+      flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.7rem;
+    }
+    .vbox__title { font-size: 0.82rem; color: var(--color-muted); letter-spacing: 0.04em; text-transform: uppercase; }
+    .vbox__cases { display: flex; gap: 0.4rem; }
+    .vbox__cases button {
+      padding: 0.25rem 0.7rem;
+      font-size: 0.78rem;
+      color: var(--color-muted);
       background: #fff;
-      border: 1px solid rgba(153, 88, 61, 0.4);
+      border: 1px solid rgba(75,51,38,0.18);
       border-radius: 999px;
-      cursor: pointer;
-      font-family: inherit;
+      cursor: pointer; font-family: inherit;
     }
-    .toy__variance button:hover { background: var(--color-accent); color: #fff; }
-    .toy__variance .bars { display: flex; gap: 1rem; margin-top: 0.7rem; font-size: 0.82rem; }
-    .toy__variance .bars .col { flex: 1; }
-    .toy__variance .bars .label { color: var(--color-muted); margin-bottom: 0.2rem; }
-    .toy__variance .bars .bar {
-      height: 0.55rem; background: rgba(75, 51, 38, 0.10); border-radius: 999px; overflow: hidden;
+    .vbox__cases button:hover { color: var(--color-accent); border-color: var(--color-accent); }
+    .vbox__cases button.active {
+      background: var(--color-accent); color: #fff; border-color: var(--color-accent);
     }
-    .toy__variance .bars .bar .fill { height: 100%; background: var(--color-accent); width: 0%; transition: width 0.4s ease; }
-    .toy__variance .bars .num { font-family: var(--font-mono); color: var(--color-heading); margin-top: 0.25rem; font-size: 0.9rem; }
+    .vbox__curves, .vbox__strip {
+      display: grid; grid-template-columns: 7.5rem 1fr; align-items: center; gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .vbox__row-label {
+      font-size: 0.78rem; color: var(--color-muted); text-align: right;
+      font-family: var(--font-mono); letter-spacing: 0.02em;
+    }
+    .vbox__curves canvas, .vbox__strip canvas {
+      width: 100%; height: auto;
+      background: #1a1a1f; border-radius: 4px;
+    }
+    .vbox__legend {
+      grid-column: 2 / 3; font-size: 0.74rem; color: var(--color-muted);
+      margin-top: -0.15rem;
+    }
+    .vbox__legend .dot {
+      display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+      vertical-align: -1px; margin-right: 2px;
+    }
+    .vbox__legend .dot.d { background: #ee9b5d; }
+    .vbox__legend .dot.a { background: #7fb878; }
+    .vbox__cbar {
+      grid-column: 1 / -1;
+      margin-top: 0.5rem; padding-left: 8.25rem;
+    }
+    .vbox__cbar canvas {
+      width: 100%; height: 9px; border-radius: 2px; display: block;
+    }
+    .vbox__cbar-ticks {
+      display: flex; justify-content: space-between;
+      font-size: 0.7rem; color: var(--color-muted); margin-top: 0.18rem;
+      font-family: var(--font-mono);
+    }
+    @media (max-width: 560px) {
+      .vbox__curves, .vbox__strip { grid-template-columns: 5rem 1fr; gap: 0.4rem; }
+      .vbox__cbar { padding-left: 5.4rem; }
+    }
     @media (max-width: 560px) {
       .toy__readout { grid-template-columns: 1fr; }
     }
@@ -270,18 +308,39 @@ sitemap: false
           </div>
         </div>
 
-        <div class="toy__variance">
-          <button id="runBtn">Draw 200 random samples &rarr;</button>
-          <div class="bars">
-            <div class="col">
-              <div class="label">Sample matching variance</div>
-              <div class="bar"><div class="fill" id="vmFill"></div></div>
-              <div class="num" id="vmNum">—</div>
+        <div class="vbox">
+          <div class="vbox__head">
+            <span class="vbox__title">Per-cell variance, N=128 grid, 128 spp</span>
+            <div class="vbox__cases" id="vboxCases" role="tablist">
+              <button data-case="0" class="active">case 1</button>
+              <button data-case="1">case 2</button>
+              <button data-case="2">case 3</button>
             </div>
-            <div class="col">
-              <div class="label">Independent DRT variance</div>
-              <div class="bar"><div class="fill" id="vdFill"></div></div>
-              <div class="num" id="vdNum">—</div>
+          </div>
+
+          <div class="vbox__curves">
+            <span class="vbox__row-label">scene</span>
+            <canvas id="curvesCanvas" width="720" height="74"></canvas>
+            <div class="vbox__legend">
+              <span class="dot d"></span> density σₜ &nbsp;&nbsp;
+              <span class="dot a"></span> albedo
+            </div>
+          </div>
+
+          <div class="vbox__strip">
+            <span class="vbox__row-label">SM (locked)</span>
+            <canvas class="vbox__strip-canvas" id="stripSM" width="720" height="22"></canvas>
+          </div>
+          <div class="vbox__strip">
+            <span class="vbox__row-label">SM (not&nbsp;locked)</span>
+            <canvas class="vbox__strip-canvas" id="stripNM" width="720" height="22"></canvas>
+          </div>
+
+          <div class="vbox__cbar">
+            <canvas id="cbarCanvas" width="720" height="9"></canvas>
+            <div class="vbox__cbar-ticks">
+              <span>low variance</span>
+              <span>high variance</span>
             </div>
           </div>
         </div>
@@ -348,9 +407,7 @@ sitemap: false
       const gsOut = document.getElementById('gsOut');
       const gtOut = document.getElementById('gtOut');
       const sumOut= document.getElementById('sumOut');
-      const runBtn= document.getElementById('runBtn');
-      const vmFill= document.getElementById('vmFill'), vdFill = document.getElementById('vdFill');
-      const vmNum = document.getElementById('vmNum'),  vdNum  = document.getElementById('vdNum');
+      // (runBtn / variance-bar DOM refs removed; replaced by the grid-variance widget below.)
 
       // ---- SVG setup -------------------------------------------------------
       const W = 720, H = 220;
@@ -459,29 +516,133 @@ sitemap: false
       lock.addEventListener('change', update);
       update();
 
-      // ---- Variance demo --------------------------------------------------
-      function variance(mode, n) {
-        let sum = 0, sum2 = 0;
-        for (let i = 0; i < n; i++) {
-          const a = Math.random();
-          const b = (mode === 'match') ? a : Math.random();
-          const v = dsigma(a) - dsigma(b);
-          sum  += v;
-          sum2 += v * v;
-        }
-        const mean = sum / n;
-        return sum2 / n - mean * mean;
+    })();
+
+    // ====== Grid-variance comparison (precomputed) ===================
+    (function () {
+      const url = '{{ "/samplematching/static/data/variance_data.json" | relative_url }}';
+      const stripSM = document.getElementById('stripSM');
+      const stripNM = document.getElementById('stripNM');
+      const curves  = document.getElementById('curvesCanvas');
+      const cbar    = document.getElementById('cbarCanvas');
+      const caseRow = document.getElementById('vboxCases');
+      if (!stripSM || !stripNM) return;
+
+      // Inferno-like diverging-warm colormap (black -> purple -> orange -> yellow).
+      const CMAP = [
+        [  0,   0,   4],
+        [ 22,  11,  57],
+        [ 66,  10, 104],
+        [106,  23, 110],
+        [147,  38, 103],
+        [187,  55,  84],
+        [221,  81,  58],
+        [243, 120,  25],
+        [252, 165,  10],
+        [246, 215,  70],
+        [252, 255, 164],
+      ];
+      function infernoRGB(t) {
+        t = Math.max(0, Math.min(1, t));
+        const f = t * (CMAP.length - 1);
+        const i = Math.min(CMAP.length - 2, Math.floor(f));
+        const u = f - i;
+        const a = CMAP[i], b = CMAP[i + 1];
+        return [
+          Math.round(a[0] * (1 - u) + b[0] * u),
+          Math.round(a[1] * (1 - u) + b[1] * u),
+          Math.round(a[2] * (1 - u) + b[2] * u),
+        ];
       }
 
-      runBtn.addEventListener('click', () => {
-        const N = 200;
-        const vm = variance('match', N);
-        const vd = variance('drt',   N);
-        const vmax = Math.max(vm, vd, 1e-6);
-        vmFill.style.width = (100 * vm / vmax).toFixed(1) + '%';
-        vdFill.style.width = (100 * vd / vmax).toFixed(1) + '%';
-        vmNum.textContent = vm.toExponential(2);
-        vdNum.textContent = vd.toExponential(2);
+      function drawCbar() {
+        const ctx = cbar.getContext('2d');
+        const W = cbar.width, H = cbar.height;
+        const img = ctx.createImageData(W, H);
+        for (let x = 0; x < W; x++) {
+          const [r, g, b] = infernoRGB(x / (W - 1));
+          for (let y = 0; y < H; y++) {
+            const o = 4 * (y * W + x);
+            img.data[o] = r; img.data[o + 1] = g; img.data[o + 2] = b; img.data[o + 3] = 255;
+          }
+        }
+        ctx.putImageData(img, 0, 0);
+      }
+      drawCbar();
+
+      function drawStrip(canvas, values, vmax) {
+        const ctx = canvas.getContext('2d');
+        const W = canvas.width, H = canvas.height;
+        const N = values.length;
+        const img = ctx.createImageData(W, H);
+        for (let x = 0; x < W; x++) {
+          // Sample the per-cell variance with linear interp across the N values.
+          const u = x / (W - 1);
+          const f = u * (N - 1);
+          const i = Math.min(N - 2, Math.floor(f));
+          const a = f - i;
+          const v = values[i] * (1 - a) + values[i + 1] * a;
+          const [r, g, b] = infernoRGB(v / Math.max(vmax, 1e-12));
+          for (let y = 0; y < H; y++) {
+            const o = 4 * (y * W + x);
+            img.data[o] = r; img.data[o + 1] = g; img.data[o + 2] = b; img.data[o + 3] = 255;
+          }
+        }
+        ctx.putImageData(img, 0, 0);
+      }
+
+      function drawCurves(density, albedo) {
+        const ctx = curves.getContext('2d');
+        const W = curves.width, H = curves.height;
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#1a1a1f';
+        ctx.fillRect(0, 0, W, H);
+        // light grid
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        ctx.lineWidth = 1;
+        for (let k = 0; k < 5; k++) {
+          const y = (k / 4) * (H - 2) + 1;
+          ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+        }
+        function plot(arr, color, min, max) {
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          for (let i = 0; i < arr.length; i++) {
+            const x = (i / (arr.length - 1)) * W;
+            const t = (arr[i] - min) / (max - min);
+            const y = H - 2 - t * (H - 4);
+            i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+        // density on its own scale
+        const dMin = Math.min(...density), dMax = Math.max(...density);
+        const aMin = Math.min(...albedo),  aMax = Math.max(...albedo);
+        plot(density, '#ee9b5d', dMin, dMax);
+        plot(albedo,  '#7fb878', aMin, aMax);
+      }
+
+      let data = null;
+      let activeCase = 0;
+
+      function render() {
+        if (!data) return;
+        const c = data.cases[activeCase];
+        drawCurves(c.density, c.albedo);
+        drawStrip(stripSM, c.var_sm, c.vmax);
+        drawStrip(stripNM, c.var_nm, c.vmax);
+      }
+
+      fetch(url).then(r => r.json()).then(d => { data = d; render(); })
+                .catch(err => { console.warn('variance data fetch failed', err); });
+
+      caseRow.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'BUTTON') return;
+        for (const b of caseRow.children) b.classList.remove('active');
+        e.target.classList.add('active');
+        activeCase = parseInt(e.target.dataset.case, 10);
+        render();
       });
     })();
 
