@@ -40,14 +40,14 @@ layout: compress
     </footer>
 
     <script>
-      // 50/50 swap of the hero portrait between the real photo and the
-      // anime alt on every page load. Runs synchronously so the swap
-      // happens before paint in practice.
+      /* 50/50 swap of the hero portrait between the real photo and the
+         anime alt on every page load (block comment so the `compress`
+         layout's newline-stripping doesn't comment out the IIFE). */
       (function () {
-        const img = document.querySelector('.hero__photo img');
+        var img = document.querySelector('.hero__photo img');
         if (!img) return;
-        const anime = '{{ "/images/profile_anime.jpg" | relative_url }}';
-        if (Math.random() < 0.5) img.src = anime;
+        var anime = '{{ "/images/profile_anime.jpg" | relative_url }}';
+        if (Math.random() < 0.5) { img.src = anime; }
       })();
     </script>
   </body>
