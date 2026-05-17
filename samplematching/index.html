@@ -70,7 +70,7 @@ sitemap: false
     .toy__readout .cell.scat strong { color: #2f6ea3; }
     .toy__readout .cell.trans strong { color: #b94a4a; }
     /* ---- Grid-variance comparison ---------------------------------------- */
-    .vbox { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid rgba(75,51,38,0.08); }
+    .vbox { margin-top: 0; padding-top: 0; }
     .vbox__head {
       display: flex; justify-content: space-between; align-items: baseline;
       flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.7rem;
@@ -263,51 +263,21 @@ sitemap: false
     </section>
 
     <section id="toy" class="sect">
-      <h2 class="subhead">Toy: scattering &amp; transmittance compete</h2>
+      <h2 class="subhead">Per-grid-cell variance, locked vs not locked</h2>
       <div class="prose" style="margin-bottom: 1.4rem;">
         <p>
-          Drag the probes along the ray segment. Each contributes a piece of the
-          per-segment extinction gradient &mdash; <strong style="color:#2f6ea3;">scattering</strong>
-          with a positive sign, <strong style="color:#b94a4a;">transmittance</strong> with a negative
-          one. When the two probes are <em>locked</em> (sample matching), they read the same field
-          and the terms <em>cancel</em>; when they wander independently (DRT), the cancellation is
-          lost and only shows up as variance over many samples.
+          We pick three random 1-D scenes &mdash; each a heterogeneous density σ<sub>t</sub>
+          and albedo on a fixed N=128 grid &mdash; compute the ground-truth ∂L/∂σ<sub>t</sub>
+          by finite differences against a high-resolution ray-march, then run the
+          two estimators at <strong>128 spp</strong> many times and record the
+          variance at every grid cell. The strip below each scene is that
+          variance painted along the grid; brighter colour means the estimator
+          is noisier at that cell. Locking the two probes (sample matching) is
+          uniformly tighter than letting them wander independently.
         </p>
       </div>
 
       <div class="toy" id="toy">
-        <div class="toy__title">Per-segment gradient estimator</div>
-        <div class="toy__hint">σ(x) is the heterogeneous extinction along the segment. The gradient piece each probe contributes is &plusmn;∂σ at its location.</div>
-
-        <svg class="toy__stage" id="toyStage" viewBox="0 0 720 220" preserveAspectRatio="none" aria-hidden="true"></svg>
-
-        <div class="toy__controls">
-          <label class="row">
-            <input type="checkbox" id="lockChk" checked>
-            <span>Lock probes (sample matching)</span>
-          </label>
-          <label class="row">
-            <span>Probe A</span>
-            <input type="range" id="aRng" min="0" max="1000" value="350">
-          </label>
-          <label class="row" id="bRow">
-            <span>Probe B</span>
-            <input type="range" id="bRng" min="0" max="1000" value="650">
-          </label>
-        </div>
-
-        <div class="toy__readout">
-          <div class="cell scat">Scattering term&nbsp;<small>(+∂σ at A)</small>
-            <strong id="gsOut">+0.00</strong>
-          </div>
-          <div class="cell trans">Transmittance term&nbsp;<small>(−∂σ at B)</small>
-            <strong id="gtOut">−0.00</strong>
-          </div>
-          <div class="cell">Estimated gradient
-            <strong id="sumOut">0.00</strong>
-          </div>
-        </div>
-
         <div class="vbox">
           <div class="vbox__head">
             <span class="vbox__title">Per-cell variance, N=128 grid, 128 spp</span>
@@ -377,147 +347,6 @@ sitemap: false
   </footer>
 
   <script>
-    (function () {
-      // ---- Field σ(x) on [0,1]: a couple of Gaussian bumps -----------------
-      const bumps = [
-        {mu: 0.22, sig: 0.10, amp: 0.85},
-        {mu: 0.55, sig: 0.07, amp: 0.55},
-        {mu: 0.82, sig: 0.09, amp: 0.95},
-      ];
-      function sigma(x) {
-        let s = 0.10;
-        for (const b of bumps) {
-          const d = (x - b.mu) / b.sig;
-          s += b.amp * Math.exp(-0.5 * d * d);
-        }
-        return s;
-      }
-      // Numerical derivative of σ
-      function dsigma(x) {
-        const h = 0.0025;
-        return (sigma(x + h) - sigma(x - h)) / (2 * h);
-      }
-
-      // ---- DOM refs --------------------------------------------------------
-      const svg   = document.getElementById('toyStage');
-      const aRng  = document.getElementById('aRng');
-      const bRng  = document.getElementById('bRng');
-      const lock  = document.getElementById('lockChk');
-      const bRow  = document.getElementById('bRow');
-      const gsOut = document.getElementById('gsOut');
-      const gtOut = document.getElementById('gtOut');
-      const sumOut= document.getElementById('sumOut');
-      // (runBtn / variance-bar DOM refs removed; replaced by the grid-variance widget below.)
-
-      // ---- SVG setup -------------------------------------------------------
-      const W = 720, H = 220;
-      const padL = 40, padR = 40, padT = 30, padB = 56;
-      const plotW = W - padL - padR, plotH = H - padT - padB;
-
-      const ns = 'http://www.w3.org/2000/svg';
-      function el(tag, attrs) {
-        const e = document.createElementNS(ns, tag);
-        for (const k in attrs) e.setAttribute(k, attrs[k]);
-        return e;
-      }
-      function xPix(x01) { return padL + x01 * plotW; }
-      function yPix(s)   { return padT + plotH - s * plotH * 0.55; }
-
-      // Build σ(x) curve
-      const ptsArr = [];
-      for (let i = 0; i <= 100; i++) {
-        const x = i / 100;
-        ptsArr.push(`${xPix(x).toFixed(2)},${yPix(sigma(x)).toFixed(2)}`);
-      }
-      // Static SVG elements
-      function buildStatic() {
-        // axis baseline
-        svg.appendChild(el('line', {
-          x1: padL, x2: W - padR,
-          y1: padT + plotH, y2: padT + plotH,
-          stroke: '#36393d', 'stroke-width': 1.2
-        }));
-        // segment label
-        const lbl = el('text', { x: W/2, y: H - 8, 'text-anchor': 'middle', fill: '#6b7280', 'font-size': 12 });
-        lbl.textContent = 'ray segment  (x along path)';
-        svg.appendChild(lbl);
-        // σ curve
-        svg.appendChild(el('polyline', {
-          points: ptsArr.join(' '),
-          fill: 'none', stroke: '#99583d', 'stroke-width': 2, opacity: 0.85
-        }));
-        // σ label
-        const slab = el('text', { x: padL - 6, y: padT + 8, 'text-anchor': 'end', fill: '#99583d', 'font-size': 12, 'font-style': 'italic' });
-        slab.textContent = 'σ(x)';
-        svg.appendChild(slab);
-      }
-      buildStatic();
-
-      // Dynamic group (probes + arrows) we redraw on update
-      const dyn = el('g', {});
-      svg.appendChild(dyn);
-
-      function clearDyn() { while (dyn.firstChild) dyn.removeChild(dyn.firstChild); }
-
-      function drawProbe(x01, color, label, sign) {
-        const x = xPix(x01);
-        const y0 = padT + plotH;
-        // shaft on the axis
-        dyn.appendChild(el('line', {
-          x1: x, x2: x, y1: y0 - 4, y2: y0 + 4,
-          stroke: color, 'stroke-width': 3
-        }));
-        // tag below
-        const t = el('text', {
-          x: x, y: y0 + 22, 'text-anchor': 'middle', fill: color, 'font-size': 12, 'font-weight': 700
-        });
-        t.textContent = label;
-        dyn.appendChild(t);
-        // arrow: magnitude ∝ ∂σ at probe, signed
-        const g = sign * dsigma(x01);
-        const amax = 1.6;
-        const k = Math.max(-1, Math.min(1, g / amax));
-        const len = k * plotH * 0.40;
-        const ay1 = y0 - 6;
-        const ay2 = y0 - 6 - len;
-        dyn.appendChild(el('line', {
-          x1: x, x2: x, y1: ay1, y2: ay2,
-          stroke: color, 'stroke-width': 2.5
-        }));
-        // arrowhead
-        const hs = 6;
-        const dir = len >= 0 ? -1 : 1;
-        const headY = ay2 + dir * hs;
-        dyn.appendChild(el('polygon', {
-          points: `${x-hs},${headY} ${x+hs},${headY} ${x},${ay2}`,
-          fill: color
-        }));
-        return g;
-      }
-
-      function update() {
-        clearDyn();
-        const a = parseInt(aRng.value, 10) / 1000;
-        const b = lock.checked ? a : parseInt(bRng.value, 10) / 1000;
-        if (lock.checked) { bRng.value = aRng.value; }
-        bRow.style.opacity = lock.checked ? 0.35 : 1;
-        bRng.disabled = lock.checked;
-
-        const gs = drawProbe(a, '#2f6ea3', 'A', +1);
-        const gt = drawProbe(b, '#b94a4a', 'B', -1);
-        const sum = gs + gt;
-
-        gsOut.textContent = (gs >= 0 ? '+' : '') + gs.toFixed(2);
-        gtOut.textContent = (gt >= 0 ? '+' : '') + gt.toFixed(2);
-        sumOut.textContent = (sum >= 0 ? '+' : '') + sum.toFixed(2);
-      }
-      aRng.addEventListener('input', update);
-      bRng.addEventListener('input', update);
-      lock.addEventListener('change', update);
-      update();
-
-    })();
-
     // ====== Grid-variance comparison (precomputed) ===================
     (function () {
       const url = '{{ "/samplematching/static/data/variance_data.json" | relative_url }}';
