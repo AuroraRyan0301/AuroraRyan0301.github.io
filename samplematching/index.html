@@ -149,6 +149,30 @@ sitemap: false
       font-size: 0.78rem; color: var(--color-muted); text-align: right;
       font-family: var(--font-mono); letter-spacing: 0.02em;
     }
+    .vbox__row-controls {
+      display: flex; flex-direction: column; align-items: flex-end;
+      gap: 0.25rem;
+    }
+    .vbox__row-controls button {
+      font-size: 0.72rem;
+      padding: 0.18rem 0.7rem;
+      border-radius: 999px;
+      background: #fff;
+      border: 1px solid rgba(75,51,38,0.25);
+      color: var(--color-muted);
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 0.02em;
+    }
+    .vbox__row-controls button:hover {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+    .vbox__row-controls button.running {
+      background: var(--color-accent);
+      color: #fff;
+      border-color: var(--color-accent);
+    }
     .vbox__curves canvas, .vbox__strip canvas {
       width: 100%; height: auto;
       background: #1a1a1f; border-radius: 4px;
@@ -339,6 +363,7 @@ sitemap: false
               <button data-case="0" class="active">case 1</button>
               <button data-case="1">case 2</button>
               <button data-case="2">case 3</button>
+              <button data-case="3">case N <span style="opacity:0.7;font-size:0.9em;">(live)</span></button>
             </div>
           </div>
 
@@ -433,7 +458,7 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>Unlock SM</strong>
-                <span>\(p_{\mathrm{scat}}(y \mid x_j) = \frac{1}{\|x_j - x_{j-1}\|}\)</span>
+                <span>\(p_{\mathrm{scat}}(y \mid x_j) = \dfrac{1}{\|x_j - x_{j-1}\|}\)</span>
               </figcaption>
             </figure>
 
@@ -463,17 +488,22 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>SM (locked)</strong>
-                <span>\(p_{\mathrm{scat}}(y \mid x_j) = \frac{1}{\|x_j - x_{j-1}\|}\)</span>
+                <span>\(p_{\mathrm{scat}}(y \mid x_j) = \dfrac{1}{\|x_j - x_{j-1}\|}\)</span>
               </figcaption>
             </figure>
           </div>
 
           <div class="vbox__curves">
-            <span class="vbox__row-label">scene</span>
+            <div class="vbox__row-controls">
+              <span class="vbox__row-label">scene</span>
+              <button id="randomSceneBtn" type="button" title="Generate a fresh random density / albedo">⟳ random</button>
+              <button id="startBtn"       type="button" title="Start streaming variance estimates">▶ start</button>
+            </div>
             <canvas id="curvesCanvas" width="720" height="74"></canvas>
             <div class="vbox__legend">
               <span class="dot d"></span> density \(\sigma_t\) &nbsp;&nbsp;
               <span class="dot a"></span> albedo
+              <span id="liveStatus" style="float:right;font-family:var(--font-mono);color:var(--color-muted);"></span>
             </div>
           </div>
 
@@ -645,9 +675,127 @@ sitemap: false
       let data = null;
       let activeCase = 0;
 
+      /* ---- live (Case N) state ----------------------------------------- */
+      var scene = null;          // {density, albedoCurve, sigmaT, albedo, seed}
+      var worker = null;
+      var running = false;
+      var lastLive = null;       // {var_sm, var_drt, var_nm, var_ff, r}
+      var statusEl = document.getElementById('liveStatus');
+      var randomBtn = document.getElementById('randomSceneBtn');
+      var startBtn  = document.getElementById('startBtn');
+      var LIVE_N    = 256;
+      var LIVE_R    = 64;        // up to this many reps streamed
+      var LIVE_SPP  = 32;
+
+      function clamp01(v){ return v < 0 ? 0 : (v > 1 ? 1 : v); }
+      function lcg(seed) {
+        var s = (seed >>> 0) || 1;
+        return function () {
+          s = ((s * 1664525) + 1013904223) >>> 0;
+          return s / 4294967296;
+        };
+      }
+      function randomCurve(seed, n) {
+        var r = lcg(seed);
+        var nB = 3 + ((r() * 3) | 0);
+        var bumps = [];
+        for (var k = 0; k < nB; k++)
+          bumps.push({ mu: 0.1 + 0.8 * r(), sig: 0.05 + 0.10 * r(),
+                       amp: (0.2 + 0.8 * r()) * (r() < 0.5 ? -1 : 1) });
+        var y = new Float32Array(n);
+        for (var i = 0; i < n; i++) {
+          var x = i / (n - 1), s = 0;
+          for (var j = 0; j < nB; j++) {
+            var d = (x - bumps[j].mu) / bumps[j].sig;
+            s += bumps[j].amp * Math.exp(-0.5 * d * d);
+          }
+          y[i] = s;
+        }
+        var mn = y[0], mx = y[0];
+        for (var i2 = 1; i2 < n; i2++) {
+          if (y[i2] < mn) mn = y[i2];
+          if (y[i2] > mx) mx = y[i2];
+        }
+        var sc = (mx > mn) ? 1 / (mx - mn) : 1;
+        for (var i3 = 0; i3 < n; i3++) y[i3] = (y[i3] - mn) * sc;
+        return y;
+      }
+      function newScene(seed) {
+        var density = randomCurve(seed, LIVE_N);
+        var albC    = randomCurve(seed + 1000, LIVE_N);
+        var sT  = new Float32Array(LIVE_N);
+        var alb = new Float32Array(LIVE_N);
+        for (var i = 0; i < LIVE_N; i++) {
+          sT[i]  = density[i] * 4.5 + 0.3;
+          alb[i] = albC[i] * 0.75 + 0.15;
+        }
+        return { density: density, albedoCurve: albC,
+                 sigmaT: sT, albedo: alb, seed: seed };
+      }
+
+      function maxArr(a) {
+        var m = a[0];
+        for (var i = 1; i < a.length; i++) if (a[i] > m) m = a[i];
+        return m;
+      }
+
+      function renderLive(msg) {
+        if (activeCase !== 3) return;  // stale message from a cancelled run
+        lastLive = msg;
+        var vmax = Math.max(maxArr(msg.var_sm), maxArr(msg.var_drt),
+                            maxArr(msg.var_nm), maxArr(msg.var_ff), 1e-12);
+        drawStrip(stripSM,  msg.var_sm,  vmax);
+        drawStrip(stripDRT, msg.var_drt, vmax);
+        drawStrip(stripNM,  msg.var_nm,  vmax);
+        drawStrip(stripFF,  msg.var_ff,  vmax);
+        statusEl.textContent = 'R = ' + msg.r + ' / ' + msg.R;
+      }
+
+      function clearStrips() {
+        var empty = new Float32Array(LIVE_N);
+        drawStrip(stripSM,  empty, 1);
+        drawStrip(stripDRT, empty, 1);
+        drawStrip(stripNM,  empty, 1);
+        drawStrip(stripFF,  empty, 1);
+      }
+
+      function setRunning(on) {
+        running = on;
+        startBtn.textContent = on ? '■ stop' : '▶ start';
+        startBtn.classList.toggle('running', on);
+      }
+
+      function initWorker() {
+        if (worker) return worker;
+        worker = new Worker('{{ "/samplematching/static/js/variance_worker.js" | relative_url }}');
+        worker.onmessage = function (e) {
+          var m = e.data;
+          if (m.type === 'progress') {
+            renderLive(m);
+          } else if (m.type === 'done') {
+            statusEl.textContent = 'R = ' + m.r + ', done';
+            setRunning(false);
+          }
+        };
+        worker.onerror = function (err) {
+          console.warn('worker error', err);
+          statusEl.textContent = 'worker error';
+          setRunning(false);
+        };
+        return worker;
+      }
+
       function render() {
+        if (activeCase === 3) {
+          if (scene) drawCurves(scene.density, scene.albedoCurve);
+          else { var ctx = curves.getContext('2d');
+                 ctx.fillStyle = '#1a1a1f';
+                 ctx.fillRect(0, 0, curves.width, curves.height); }
+          if (lastLive) renderLive(lastLive); else clearStrips();
+          return;
+        }
         if (!data) return;
-        const c = data.cases[activeCase];
+        var c = data.cases[activeCase];
         drawCurves(c.density, c.albedo);
         drawStrip(stripSM,  c.var_sm,  c.vmax);
         drawStrip(stripDRT, c.var_drt, c.vmax);
@@ -655,15 +803,66 @@ sitemap: false
         drawStrip(stripFF,  c.var_ff,  c.vmax);
       }
 
-      fetch(url).then(r => r.json()).then(d => { data = d; render(); })
-                .catch(err => { console.warn('variance data fetch failed', err); });
+      fetch(url).then(function (r) { return r.json(); })
+                .then(function (d) { data = d; render(); })
+                .catch(function (err) { console.warn('variance data fetch failed', err); });
 
-      caseRow.addEventListener('click', (e) => {
-        if (e.target.tagName !== 'BUTTON') return;
-        for (const b of caseRow.children) b.classList.remove('active');
-        e.target.classList.add('active');
-        activeCase = parseInt(e.target.dataset.case, 10);
+      caseRow.addEventListener('click', function (e) {
+        if (e.target.tagName !== 'BUTTON' && e.target.parentElement.tagName !== 'BUTTON') return;
+        var btn = e.target.tagName === 'BUTTON' ? e.target : e.target.parentElement;
+        for (var i = 0; i < caseRow.children.length; i++) caseRow.children[i].classList.remove('active');
+        btn.classList.add('active');
+        activeCase = parseInt(btn.dataset.case, 10);
+        // Leaving Case N cancels any in-flight live computation.
+        if (activeCase !== 3 && running) {
+          if (worker) worker.postMessage({ type: 'cancel' });
+          setRunning(false);
+          statusEl.textContent = '';
+        }
         render();
+      });
+
+      randomBtn.addEventListener('click', function () {
+        // Cancel any running job
+        if (running && worker) worker.postMessage({ type: 'cancel' });
+        setRunning(false);
+        // Switch to Case N
+        for (var i = 0; i < caseRow.children.length; i++) caseRow.children[i].classList.remove('active');
+        caseRow.querySelector('[data-case="3"]').classList.add('active');
+        activeCase = 3;
+        scene = newScene((Math.random() * 1e9) | 0);
+        lastLive = null;
+        drawCurves(scene.density, scene.albedoCurve);
+        clearStrips();
+        statusEl.textContent = 'ready · click ▶ start';
+      });
+
+      startBtn.addEventListener('click', function () {
+        if (running) {
+          if (worker) worker.postMessage({ type: 'cancel' });
+          setRunning(false);
+          statusEl.textContent = 'cancelled';
+          return;
+        }
+        if (!scene) {
+          randomBtn.click();
+        }
+        // Cloning so transfer can't strip the originals
+        var sT  = new Float32Array(scene.sigmaT);
+        var alb = new Float32Array(scene.albedo);
+        var w = initWorker();
+        w.postMessage({
+          type: 'start',
+          N: scene.density.length,
+          sigmaT: sT,
+          albedo: alb,
+          modes: ['sm', 'drt', 'nm', 'ff'],
+          R: LIVE_R,
+          SPP: LIVE_SPP,
+          seed: scene.seed,
+        }, [sT.buffer, alb.buffer]);
+        setRunning(true);
+        statusEl.textContent = 'R = 0 / ' + LIVE_R;
       });
     })();
 
