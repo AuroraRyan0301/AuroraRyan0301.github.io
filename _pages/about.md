@@ -35,7 +35,8 @@ redirect_from:
           &mdash; a term that is kind of abused today) &mdash; representations we
           can not only render and reconstruct, but also <em>act on</em> to
           understand and feed back into the physical world. I work on
-          <strong>physics-based / differentiable rendering</strong> and
+          <strong>video models</strong>, <strong>3D generation</strong>,
+          <strong>physics-based / differentiable rendering</strong>, and
           <strong>neural scene representations</strong>, and I'm broadly interested
           in <strong>simulation</strong> and <strong>robotics</strong>.
         </p>
