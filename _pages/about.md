@@ -68,7 +68,9 @@ redirect_from:
     </article>
 
     <article class="pub">
-      <div class="pub__thumb pub__thumb--empty">no preview yet</div>
+      <div class="pub__thumb">
+        <img src="{{ '/images/gwr_thumb.png' | relative_url }}" alt="Generative World Renderer — Ours visual condition (snowy weather)">
+      </div>
       <div class="pub__body">
         <h3 class="pub__title">Generative World Renderer</h3>
         <p class="pub__authors">
