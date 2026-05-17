@@ -118,20 +118,52 @@ section.sect--frag-inner {
   margin-bottom: 0.5rem;
 }
 
-/* ---- Best-paper award (plain orange, bold, no frame) ------------------ */
+/* ---- Best-paper award (plain text + soft-rainbow flowing gradient) ---- */
 
 .award {
-  margin: 0.15rem 0 0.9rem;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #d97706;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: 0.2rem 0 0.9rem;
+  padding: 0;
   background: none;
   border: none;
-  padding: 0;
-  letter-spacing: normal;
-  text-transform: none;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
-.award::before { content: "★ "; }
+.award__icon { font-size: 1.1em; line-height: 1; }
+.award__text {
+  background-image: linear-gradient(
+    90deg,
+    #e87a7a   0%,
+    #ee9b5d  14%,
+    #e3b258  28%,
+    #7fb878  42%,
+    #6ca6c8  57%,
+    #9a8ad0  71%,
+    #d586a6  85%,
+    #e87a7a 100%
+  );
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: award-flow 9s linear infinite;
+}
+@keyframes award-flow {
+  0%   { background-position:   0% 50%; }
+  100% { background-position: 220% 50%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .award__text { animation: none; }
+}
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .award__text { color: #c8541e; }
+}
 
 /* ---- Hero -------------------------------------------------------------- */
 

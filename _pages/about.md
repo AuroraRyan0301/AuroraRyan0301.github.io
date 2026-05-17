@@ -70,7 +70,10 @@ redirect_from:
           Feng Xu, Shuang Zhao
         </p>
         <p class="pub__venue">ACM Transactions on Graphics (TOG), 2026</p>
-        <p class="pub__award">Best papers award honorable mention</p>
+        <p class="pub__award">
+          <span class="pub__award-icon" aria-hidden="true">&#x1F3C6;</span>
+          <span class="pub__award-text">Best papers award honorable mention</span>
+        </p>
         <p class="pub__links">
           <a href="{{ '/samplematching/' | relative_url }}">project page</a>
           <a href="#">paper (soon)</a>
