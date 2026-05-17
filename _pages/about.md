@@ -39,7 +39,7 @@ redirect_from:
       </p>
     </div>
     <div class="hero__photo">
-      <img src="{{ '/images/profile.png' | relative_url }}" alt="Ruihan Yu">
+      <img src="{{ '/images/profile.jpg' | relative_url }}" alt="Ruihan Yu">
     </div>
   </div>
 </section>
