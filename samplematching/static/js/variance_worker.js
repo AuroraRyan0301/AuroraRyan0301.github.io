@@ -4,8 +4,8 @@
 
 const X_MIN = 0.0;
 const X_MAX = 1.0;
-const MAX_BOUNCES = 24;
-const L_LIGHT = 5.0;
+const MAX_BOUNCES = 0;      // zero-bounce: emission-absorption, no scatter cascade
+const L_LIGHT = 1.0;        // boundary radiance
 
 let N = 256;     // grid resolution (rewritten per job)
 let DX = (X_MAX - X_MIN) / (N - 1);
@@ -124,60 +124,58 @@ function gradEstimate(sigmaT, albedo, sigmaBar, rng, mode) {
   return grad;
 }
 
-/* ---- Paper-DRT (Nimier-David et al. 2022 List 1):
- *      Weighted Reservoir Sampling along the ray with weights ∝ T(t).
- *      The reservoir picks ONE position out of all delta-tracking probes,
- *      with PDF proportional to T at that position. PDF(y) = T(y) / ∫T,
- *      so the estimator 1/PDF · T(y) · α · L_s collapses to
- *      W_T · α(y) · L_s(y)  where W_T = ∫₀^{X_MAX} T(t) dt is the
- *      reservoir's running total weight. Trans term stays per-segment. */
-function paperDrtEstimate(sigmaT, albedo, sigmaBar, rng) {
+/* ---- Per-scene caches for paper-DRT (inverse-CDF on T) --------------- */
+function buildTandCDF(sigmaT) {
+  // T[i]   = exp(-∫_0^{i*DX} σ_t dt)            (transmittance at grid node i)
+  // CDF[i] = ∫_0^{i*DX} T(t) dt                  (cumulative ∫T, trapezoid)
+  const T   = new Float64Array(N);
+  const CDF = new Float64Array(N);
+  T[0]   = 1.0;
+  CDF[0] = 0.0;
+  let tau = 0.0;
+  for (let i = 1; i < N; i++) {
+    tau += 0.5 * (sigmaT[i - 1] + sigmaT[i]) * DX;
+    T[i] = Math.exp(-tau);
+    CDF[i] = CDF[i - 1] + 0.5 * (T[i - 1] + T[i]) * DX;
+  }
+  return { T: T, CDF: CDF, total: CDF[N - 1] };
+}
+function inverseCDFsample(CDF, total, u) {
+  // Find y such that CDF(y) = u*total via binary search + linear interp.
+  const target = u * total;
+  let lo = 0, hi = N - 1;
+  while (lo < hi) {
+    const mid = (lo + hi) >> 1;
+    if (CDF[mid] < target) lo = mid + 1; else hi = mid;
+  }
+  if (lo === 0) return X_MIN;
+  const d = CDF[lo] - CDF[lo - 1];
+  const f = d > 0 ? (target - CDF[lo - 1]) / d : 0;
+  return X_MIN + (lo - 1 + f) * DX;
+}
+
+/* ---- Paper-DRT (Nimier-David et al. 2022, List 1)
+ *      Sample one scat probe y from [X_MIN, X_MAX] with PDF ∝ T(y) via
+ *      inverse-CDF on the precomputed ∫T table. PDF(y) = T(y) / total,
+ *      so the estimator (1/PDF)·T(y)·α·L_s collapses to
+ *      total · α(y) · L_s(y).  Trans term stays as Eq.5 per segment. */
+function paperDrtEstimate(sigmaT, albedo, sigmaBar, rng, cache) {
   const grad = new Float64Array(N);
   const positions = buildPath(sigmaT, sigmaBar, rng);
   const nb = positions.length - 1;
   const L = backwardRadiance(positions, albedo);
 
-  // ---- scattering term : WRS ∝ T(t) along the ray ---------------------
-  // Walk via ratio-tracking-style steps with a majorant sigmaBar. Each
-  // step contributes weight T(t_i)·Δt to the reservoir. T accumulates as
-  // we go (no rejection, no early termination).
-  let tWalk = X_MIN;
-  let tau   = 0.0;          // running optical depth from X_MIN to tWalk
-  let wSum  = 0.0;          // ∫ T(t) dt so far
-  let yRes  = X_MIN;        // reservoir's currently-held position
-  let stepCount = 0;
-  while (tWalk < X_MAX && stepCount < 4096) {
-    stepCount++;
-    let u = rng();
-    if (u < 1e-10) u = 1e-10;
-    let dt = -Math.log(u) / sigmaBar;
-    let tNext = tWalk + dt;
-    if (tNext > X_MAX) { dt = X_MAX - tWalk; tNext = X_MAX; }
-    // midpoint approximation: σ at tWalk + dt/2, contribution to ∫T dt
-    const tMid = tWalk + 0.5 * dt;
-    const T_mid = Math.exp(-(tau + 0.5 * interp(sigmaT, tMid) * dt));
-    const w_i = T_mid * dt;
-    wSum += w_i;
-    // WRS swap: replace reservoir with this step's position w.p. w_i / wSum
-    if (rng() * wSum < w_i) {
-      // place reservoir at a uniform position within this step
-      yRes = tWalk + rng() * dt;
-    }
-    // advance optical depth
-    tau += interp(sigmaT, tMid) * dt;
-    tWalk = tNext;
-  }
-  // Now yRes is the reservoir sample with PDF ∝ T; wSum = ∫T dt.
-  const alpha_y = interp(albedo, yRes);
+  // ---- scattering term : inverse-CDF sample ∝ T --------------------
+  const yScat = inverseCDFsample(cache.CDF, cache.total, rng());
+  const alpha_y = interp(albedo, yScat);
   let segIdx = nb;
   for (let j = 0; j < nb; j++) {
-    if (yRes < positions[j + 1]) { segIdx = j; break; }
+    if (yScat < positions[j + 1]) { segIdx = j; break; }
   }
   const Lnext_scat = (segIdx < nb) ? L[segIdx + 1] : L_LIGHT;
-  // Estimator = (1/PDF) · T(y) · α(y) · L_s(y) = wSum · α(y) · L_s(y)
-  interpBwd(grad, yRes, wSum * alpha_y * Lnext_scat);
+  interpBwd(grad, yScat, cache.total * alpha_y * Lnext_scat);
 
-  // ---- transmittance term : per-segment Eq.5 -------------------------
+  // ---- transmittance term : per-segment Eq.5 -----------------------
   for (let j = 0; j <= nb; j++) {
     const seg_start = positions[j];
     const seg_end   = j < nb ? positions[j + 1] : X_MAX;
@@ -257,6 +255,7 @@ self.addEventListener('message', (e) => {
   let smax = 0;
   for (let i = 0; i < N; i++) if (sigmaT[i] > smax) smax = sigmaT[i];
   const sigmaBar = smax * 1.01;
+  const drtCache = buildTandCDF(sigmaT);   // per-scene CDF for paper-DRT
 
   const modes = m.modes;
   const R   = m.R | 0;
@@ -291,7 +290,7 @@ self.addEventListener('message', (e) => {
       for (let s = 0; s < SPP; s++) {
         let g;
         if      (mode === 'nm' ) g = twoPathEstimate(sigmaT, albedo, sigmaBar, rng);
-        else if (mode === 'drt') g = paperDrtEstimate(sigmaT, albedo, sigmaBar, rng);
+        else if (mode === 'drt') g = paperDrtEstimate(sigmaT, albedo, sigmaBar, rng, drtCache);
         else                     g = gradEstimate    (sigmaT, albedo, sigmaBar, rng, mode);
         for (let i = 0; i < N; i++) sppAvg[i] += g[i];
       }

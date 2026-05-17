@@ -19,13 +19,13 @@ N        = 256                       # grid resolution
 X_MIN    = 0.0
 X_MAX    = 1.0
 DX       = (X_MAX - X_MIN) / (N - 1)
-L_LIGHT  = 5.0
+L_LIGHT  = 1.0                       # boundary radiance (zero-bounce / emission-absorption)
 SPP      = 128                       # samples per gradient estimate
 R        = 5120                      # number of SPP-averaged estimates per case
 M_GT     = 1500
 EPSILON  = 1e-3
 N_CASES  = 3
-MAX_BOUNCES = 32
+MAX_BOUNCES = 0                      # 0-bounce: no scatter cascade, just T σ ε
 
 # Mode IDs: 0=SM, 1=DRT, 2=FF, 3=NM (two paths)
 MODE_SM, MODE_DRT, MODE_FF, MODE_NM = 0, 1, 2, 3
@@ -142,11 +142,59 @@ def _grad_one(sigma_t, albedo, sigma_bar, state, mode, out,
 
 
 @njit(cache=True, fastmath=True)
+def _interp_T(t, sigma_t, x_min, dx, N):
+    """Compute T(0 → t) = exp(-∫₀^t σ_t) via trapezoid up to t."""
+    if t <= x_min: return 1.0
+    tau = 0.0
+    # Walk grid cells up to the cell containing t
+    i = int((t - x_min) / dx)
+    if i < 0: i = 0
+    if i > N - 1: i = N - 1
+    for k in range(i):
+        tau += 0.5 * (sigma_t[k] + sigma_t[k + 1]) * dx
+    # Partial last cell from grid node i to t
+    if i < N - 1:
+        frac = (t - (x_min + i * dx)) / dx
+        sig_at_t = (1.0 - frac) * sigma_t[i] + frac * sigma_t[i + 1]
+        tau += 0.5 * (sigma_t[i] + sig_at_t) * frac * dx
+    return math.exp(-tau)
+
+@njit(cache=True, fastmath=True)
+def _build_T_CDF(sigma_t, x_min, dx, N):
+    """Precompute T(t) and cumulative ∫T dt on the grid (trapezoid)."""
+    T   = np.empty(N, dtype=np.float64)
+    CDF = np.empty(N, dtype=np.float64)
+    T[0] = 1.0
+    CDF[0] = 0.0
+    tau = 0.0
+    for i in range(1, N):
+        tau += 0.5 * (sigma_t[i - 1] + sigma_t[i]) * dx
+        T[i] = math.exp(-tau)
+        CDF[i] = CDF[i - 1] + 0.5 * (T[i - 1] + T[i]) * dx
+    return T, CDF
+
+@njit(cache=True, fastmath=True)
+def _inv_cdf(CDF, total, u, x_min, dx, N):
+    target = u * total
+    lo = 0
+    hi = N - 1
+    while lo < hi:
+        mid = (lo + hi) >> 1
+        if CDF[mid] < target:
+            lo = mid + 1
+        else:
+            hi = mid
+    if lo == 0:
+        return x_min
+    d = CDF[lo] - CDF[lo - 1]
+    f = (target - CDF[lo - 1]) / d if d > 0 else 0.0
+    return x_min + (lo - 1 + f) * dx
+
+@njit(cache=True, fastmath=True)
 def _paper_drt(sigma_t, albedo, sigma_bar, state, out,
-               x_min, x_max, dx, N, max_bounces, L_light):
-    """Paper-DRT (Nimier-David et al. 2022, List 1) via weighted reservoir
-    sampling along the ray. WRS gives a single scat-sample y with PDF
-    ∝ T(y); contribution simplifies to (∫T)·α(y)·L_s(y)·∂σ_t.
+               x_min, x_max, dx, N, max_bounces, L_light, CDF, total):
+    """Paper-DRT (Nimier-David et al. 2022 List 1) via inverse-CDF on
+    ∫T dt: one scat sample y ∝ T; estimator = total · α(y) · L_s(y).
     Trans term stays as Eq.5 per segment."""
     # ---- forward path (delta tracking) ------------------------------
     positions = np.empty(max_bounces + 1, dtype=np.float64)
@@ -175,40 +223,23 @@ def _paper_drt(sigma_t, albedo, sigma_bar, state, out,
     for j in range(n_b - 1, -1, -1):
         L[j] = _interp(albedo, positions[j + 1], x_min, dx, N) * L[j + 1]
 
-    # ---- WRS ∝ T(t) along the ray ----------------------------------
-    t_walk = x_min
-    tau    = 0.0
-    w_sum  = 0.0
-    y_res  = x_min
-    for stepc in range(4096):
-        if t_walk >= x_max: break
-        u = _pcg(state)
-        if u < 1e-10: u = 1e-10
-        dt = -math.log(u) / sigma_bar
-        t_next = t_walk + dt
-        if t_next > x_max:
-            dt = x_max - t_walk
-            t_next = x_max
-        t_mid = t_walk + 0.5 * dt
-        sig_mid = _interp(sigma_t, t_mid, x_min, dx, N)
-        T_mid = math.exp(-(tau + 0.5 * sig_mid * dt))
-        w_i = T_mid * dt
-        w_sum += w_i
-        if _pcg(state) * w_sum < w_i:
-            y_res = t_walk + _pcg(state) * dt
-        tau += sig_mid * dt
-        t_walk = t_next
-
-    # scat contribution = w_sum * α(y) * L_s(y)
-    alpha_y = _interp(albedo, y_res, x_min, dx, N)
-    # locate segment containing y_res
+    # ---- scat: inverse-CDF sample ∝ T -------------------------------
+    # Path-replay normalisation: divide by T(0→x_{j-1}) so we use the
+    # per-segment transmittance T(x_{j-1}→y) instead of the global one.
+    u = _pcg(state)
+    y_scat = _inv_cdf(CDF, total, u, x_min, dx, N)
+    alpha_y = _interp(albedo, y_scat, x_min, dx, N)
     seg_idx = n_b
     for j in range(n_b):
-        if y_res < positions[j + 1]:
+        if y_scat < positions[j + 1]:
             seg_idx = j
             break
     L_next_scat = L[seg_idx + 1] if seg_idx < n_b else L_light
-    _interp_bwd(out, y_res, w_sum * alpha_y * L_next_scat, x_min, dx, N)
+    # T at segment start of seg_idx
+    T_seg_start = _interp_T(positions[seg_idx], sigma_t, x_min, dx, N)
+    _interp_bwd(out, y_scat,
+                total * alpha_y * L_next_scat / max(T_seg_start, 1e-12),
+                x_min, dx, N)
 
     # ---- trans term per segment (Eq.5) -----------------------------
     for j in range(n_b + 1):
@@ -301,6 +332,9 @@ def _variance_pass(sigma_t, albedo, sigma_bar, mode, R, SPP, seed_base,
     spp_buf   = np.empty(N, dtype=np.float64)
     one_buf   = np.empty(N, dtype=np.float64)
     state = np.empty(1, dtype=np.uint64)
+    # Per-scene cache for paper-DRT (∫T table)
+    T_arr, CDF = _build_T_CDF(sigma_t, x_min, dx, N)
+    total = CDF[N - 1]
     for r in range(R):
         seed = (seed_base + np.uint64(r) * np.uint64(7919)) & np.uint64(0xFFFFFFFF)
         if seed == 0: seed = np.uint64(1)
@@ -315,7 +349,7 @@ def _variance_pass(sigma_t, albedo, sigma_bar, mode, R, SPP, seed_base,
                                x_min, x_max, dx, N, max_bounces, L_light)
             elif mode == MODE_DRT:
                 _paper_drt(sigma_t, albedo, sigma_bar, state, one_buf,
-                           x_min, x_max, dx, N, max_bounces, L_light)
+                           x_min, x_max, dx, N, max_bounces, L_light, CDF, total)
             else:
                 _grad_one(sigma_t, albedo, sigma_bar, state, mode, one_buf,
                           x_min, x_max, dx, N, max_bounces, L_light)
