@@ -44,8 +44,8 @@ redirect_from:
           in <strong>simulation</strong> and <strong>robotics</strong>.
         </p>
         <p>
-          <strong>I am currently looking for a PhD position</strong>
-          &mdash; please feel free to reach out.
+          <strong>I am currently looking for a PhD position and welcome
+          collaborations</strong> &mdash; please feel free to reach out.
         </p>
       </div>
       <p class="hero__contact">
