@@ -15,6 +15,11 @@ sitemap: false
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    .teaser__media { aspect-ratio: 1878 / 837; background:#f4efe9; border-radius:8px; overflow:hidden; }
+    .teaser__media img { width:100%; height:100%; object-fit: contain; }
+    .figgrid img { background:#fff; }
+  </style>
 </head>
 <body>
 
@@ -60,8 +65,11 @@ sitemap: false
 
     <section class="teaser">
       <figure>
-        <img src="{{ '/2dgh/static/images/teaser.png' | relative_url }}"
-             alt="2DGH teaser: color/normal/depth comparison against 2DGS">
+        <div class="teaser__media">
+          <img src="{{ '/2dgh/static/images/teaser.png' | relative_url }}"
+               width="1878" height="837"
+               alt="2DGH teaser: color/normal/depth comparison against 2DGS">
+        </div>
         <figcaption>
           Replacing the Gaussian primitive with a Gaussian-Hermite kernel yields sharper edges, more
           accurate normals, and cleaner depth &mdash; while keeping the splatting pipeline intact.
@@ -118,26 +126,46 @@ sitemap: false
     </section>
 
     <section id="results" class="sect sect--frag-inner">
-      <h2 class="subhead">Method &amp; Results</h2>
+      <h2 class="subhead">Results</h2>
       <div class="prose">
         <p>
-          The Gaussian-Hermite kernel is a product of a Gaussian and a Hermite polynomial in 2D &mdash;
-          the rank parameter <em>(M, N)</em> controls how many Hermite modes contribute, with rank
-          zero collapsing back to the standard Gaussian. The optimisation pipeline (initialisation,
-          densification, rasterisation) is otherwise compatible with 2D Gaussian Splatting.
+          Across MipNeRF360, our Detail dataset, and DTU, the Gaussian-Hermite primitive consistently
+          sharpens silhouettes and high-frequency texture while keeping the splatting pipeline
+          unchanged. Below are qualitative comparisons against 2DGS and 2DGES; full quantitative
+          tables are in the paper.
         </p>
       </div>
       <div class="figgrid">
         <figure>
-          <img src="{{ '/2dgh/static/images/hermite_series.png' | relative_url }}"
-               alt="Gaussian-Hermite basis functions">
-          <figcaption>The first few Gaussian-Hermite basis functions used as primitives.</figcaption>
+          <img src="{{ '/2dgh/static/images/m360_nvs.png' | relative_url }}"
+               alt="Novel view synthesis on MipNeRF360 (Flowers, Room)">
+          <figcaption>
+            Novel view synthesis on <em>MipNeRF360</em> &mdash; Flowers (top) and Room (bottom). 2DGH
+            recovers cleaner petals and crisper edges than 2DGS / 2DGES.
+          </figcaption>
         </figure>
         <figure>
-          <img src="{{ '/2dgh/static/images/coeff_pyramid.png' | relative_url }}"
-               alt="Coefficient pyramid">
+          <img src="{{ '/2dgh/static/images/detail_nvs.png' | relative_url }}"
+               alt="Detail dataset NVS + per-pixel error">
           <figcaption>
-            Coefficient pyramid &mdash; coarse modes are learned first, finer modes added later for stability.
+            Our <em>Detail</em> dataset: top row of each pair is the RGB result, bottom row is the
+            per-pixel error against ground truth. 2DGH has noticeably less residual energy on edges.
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="{{ '/2dgh/static/images/normal.png' | relative_url }}"
+               alt="Normal-map comparison on MipNeRF360 bonsai and garden">
+          <figcaption>
+            Surface normals on <em>bonsai</em> and <em>garden</em> &mdash; sharper edges translate to
+            cleaner normal maps without rolling-off the silhouette.
+          </figcaption>
+        </figure>
+        <figure>
+          <img src="{{ '/2dgh/static/images/dtu.png' | relative_url }}"
+               alt="DTU geometry reconstruction error">
+          <figcaption>
+            DTU geometry reconstruction error (lower is better) &mdash; consistent improvements on
+            thin-structure regions across multiple scans.
           </figcaption>
         </figure>
       </div>

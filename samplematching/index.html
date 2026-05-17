@@ -15,6 +15,82 @@ sitemap: false
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    /* Aspect-ratio reservation so first paint shows the full teaser / video. */
+    .teaser__media {
+      aspect-ratio: 1955 / 313;
+      background: #f4efe9;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .teaser__media img { width: 100%; height: 100%; object-fit: contain; }
+    .teaser__video {
+      aspect-ratio: 16 / 9;
+      background: #f4efe9;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 24px rgba(75, 51, 38, 0.10);
+    }
+    .teaser__video video { width: 100%; height: 100%; display: block; }
+
+    /* ---- Interactive toy ------------------------------------------------ */
+    .toy {
+      max-width: 48rem;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid rgba(75, 51, 38, 0.10);
+      border-radius: 12px;
+      padding: 1.4rem 1.6rem 1.6rem;
+      box-shadow: 0 2px 12px rgba(75, 51, 38, 0.05);
+    }
+    .toy__title { font-family: var(--font-serif); font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem; }
+    .toy__hint  { font-size: 0.85rem; color: var(--color-muted); margin-bottom: 1rem; }
+    .toy__stage { width: 100%; height: 220px; }
+    .toy__controls {
+      display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center;
+      margin: 0.8rem 0 0.4rem; font-size: 0.88rem;
+    }
+    .toy__controls label.row { display: flex; align-items: center; gap: 0.5rem; }
+    .toy__controls input[type=range] { width: 11rem; accent-color: var(--color-accent); }
+    .toy__controls input[type=checkbox] { accent-color: var(--color-accent); width: 1rem; height: 1rem; }
+    .toy__readout {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+    .toy__readout .cell {
+      background: var(--color-frag);
+      padding: 0.6rem 0.8rem; border-radius: 6px;
+      text-align: center;
+    }
+    .toy__readout .cell strong { display: block; font-family: var(--font-mono); font-size: 1.05rem; margin-top: 0.1rem; color: var(--color-heading); }
+    .toy__readout .cell.scat strong { color: #2f6ea3; }
+    .toy__readout .cell.trans strong { color: #b94a4a; }
+    .toy__variance { margin-top: 1rem; }
+    .toy__variance button {
+      display: inline-block;
+      padding: 0.4rem 0.95rem;
+      font-size: 0.86rem;
+      color: var(--color-accent);
+      background: #fff;
+      border: 1px solid rgba(153, 88, 61, 0.4);
+      border-radius: 999px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .toy__variance button:hover { background: var(--color-accent); color: #fff; }
+    .toy__variance .bars { display: flex; gap: 1rem; margin-top: 0.7rem; font-size: 0.82rem; }
+    .toy__variance .bars .col { flex: 1; }
+    .toy__variance .bars .label { color: var(--color-muted); margin-bottom: 0.2rem; }
+    .toy__variance .bars .bar {
+      height: 0.55rem; background: rgba(75, 51, 38, 0.10); border-radius: 999px; overflow: hidden;
+    }
+    .toy__variance .bars .bar .fill { height: 100%; background: var(--color-accent); width: 0%; transition: width 0.4s ease; }
+    .toy__variance .bars .num { font-family: var(--font-mono); color: var(--color-heading); margin-top: 0.25rem; font-size: 0.9rem; }
+    @media (max-width: 560px) {
+      .toy__readout { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
@@ -23,8 +99,8 @@ sitemap: false
       <a class="topbar__brand" href="{{ '/' | relative_url }}">&larr; Ruihan Yu</a>
       <nav class="topbar__nav">
         <a href="#abstract">Abstract</a>
+        <a href="#toy">Toy</a>
         <a href="#video">Video</a>
-        <a href="#method">Method</a>
         <a href="#bibtex">BibTeX</a>
       </nav>
     </div>
@@ -63,8 +139,11 @@ sitemap: false
 
     <section class="teaser">
       <figure>
-        <img src="{{ '/samplematching/static/images/teaser.png' | relative_url }}"
-             alt="Teaser: DRT vs Reference vs Ours, with error heatmap">
+        <div class="teaser__media">
+          <img src="{{ '/samplematching/static/images/teaser.png' | relative_url }}"
+               width="1955" height="313"
+               alt="Teaser: DRT vs Reference vs Ours, with error heatmap">
+        </div>
         <figcaption>
           A single shared probe per segment (Ours) reduces gradient variance by up to 80% over DRT on the same compute budget.
         </figcaption>
@@ -91,35 +170,78 @@ sitemap: false
       </div>
     </section>
 
-    <section id="video" class="sect">
-      <h2 class="subhead">Video</h2>
-      <div class="teaser" style="padding-top:0;">
-        <figure>
-          <video controls playsinline preload="metadata"
-                 poster="{{ '/samplematching/static/images/teaser.png' | relative_url }}">
-            <source src="{{ '/samplematching/static/videos/paper_video.mp4' | relative_url }}" type="video/mp4">
-            Sorry, your browser doesn't support embedded video.
-          </video>
-        </figure>
+    <section id="toy" class="sect">
+      <h2 class="subhead">Toy: scattering &amp; transmittance compete</h2>
+      <div class="prose" style="margin-bottom: 1.4rem;">
+        <p>
+          Drag the probes along the ray segment. Each contributes a piece of the
+          per-segment extinction gradient &mdash; <strong style="color:#2f6ea3;">scattering</strong>
+          with a positive sign, <strong style="color:#b94a4a;">transmittance</strong> with a negative
+          one. When the two probes are <em>locked</em> (sample matching), they read the same field
+          and the terms <em>cancel</em>; when they wander independently (DRT), the cancellation is
+          lost and only shows up as variance over many samples.
+        </p>
+      </div>
+
+      <div class="toy" id="toy">
+        <div class="toy__title">Per-segment gradient estimator</div>
+        <div class="toy__hint">σ(x) is the heterogeneous extinction along the segment. The gradient piece each probe contributes is &plusmn;∂σ at its location.</div>
+
+        <svg class="toy__stage" id="toyStage" viewBox="0 0 720 220" preserveAspectRatio="none" aria-hidden="true"></svg>
+
+        <div class="toy__controls">
+          <label class="row">
+            <input type="checkbox" id="lockChk" checked>
+            <span>Lock probes (sample matching)</span>
+          </label>
+          <label class="row">
+            <span>Probe A</span>
+            <input type="range" id="aRng" min="0" max="1000" value="350">
+          </label>
+          <label class="row" id="bRow">
+            <span>Probe B</span>
+            <input type="range" id="bRng" min="0" max="1000" value="650">
+          </label>
+        </div>
+
+        <div class="toy__readout">
+          <div class="cell scat">Scattering term&nbsp;<small>(+∂σ at A)</small>
+            <strong id="gsOut">+0.00</strong>
+          </div>
+          <div class="cell trans">Transmittance term&nbsp;<small>(−∂σ at B)</small>
+            <strong id="gtOut">−0.00</strong>
+          </div>
+          <div class="cell">Estimated gradient
+            <strong id="sumOut">0.00</strong>
+          </div>
+        </div>
+
+        <div class="toy__variance">
+          <button id="runBtn">Draw 200 random samples &rarr;</button>
+          <div class="bars">
+            <div class="col">
+              <div class="label">Sample matching variance</div>
+              <div class="bar"><div class="fill" id="vmFill"></div></div>
+              <div class="num" id="vmNum">—</div>
+            </div>
+            <div class="col">
+              <div class="label">Independent DRT variance</div>
+              <div class="bar"><div class="fill" id="vdFill"></div></div>
+              <div class="num" id="vdNum">—</div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section id="method" class="sect sect--frag-inner">
-      <h2 class="subhead">Method at a Glance</h2>
-      <div class="prose">
-        <p>
-          For each ray segment we rewrite the variance source of the extinction gradient as an
-          integral on a 2D triangular domain &mdash; one axis is the segment depth, the other is the
-          probe depth. Standard DRT picks two <em>independent</em> samples from this domain, losing
-          the cancellation between the scattering and transmittance terms.
-        </p>
-        <p>
-          Sample matching draws a single sample from a joint density on the same triangle, so the
-          two terms are evaluated at the <strong>same shared probe</strong>. The estimator remains
-          unbiased, but the inherited negative correlation collapses much of the variance. The
-          construction generalises across participating-media path integrators and composes with
-          existing gradient-tracing strategies.
-        </p>
+    <section id="video" class="sect sect--frag-inner">
+      <h2 class="subhead">Video</h2>
+      <div class="teaser__video">
+        <video controls playsinline preload="metadata"
+               poster="{{ '/samplematching/static/images/teaser.png' | relative_url }}">
+          <source src="{{ '/samplematching/static/videos/paper_video.mp4' | relative_url }}" type="video/mp4">
+          Sorry, your browser doesn't support embedded video.
+        </video>
       </div>
     </section>
 
@@ -141,5 +263,173 @@ sitemap: false
     <p>&copy; 2026 Ruihan Yu &nbsp;&middot;&nbsp; <a href="{{ '/' | relative_url }}">Back to homepage</a></p>
   </footer>
 
+  <script>
+    (function () {
+      // ---- Field σ(x) on [0,1]: a couple of Gaussian bumps -----------------
+      const bumps = [
+        {mu: 0.22, sig: 0.10, amp: 0.85},
+        {mu: 0.55, sig: 0.07, amp: 0.55},
+        {mu: 0.82, sig: 0.09, amp: 0.95},
+      ];
+      function sigma(x) {
+        let s = 0.10;
+        for (const b of bumps) {
+          const d = (x - b.mu) / b.sig;
+          s += b.amp * Math.exp(-0.5 * d * d);
+        }
+        return s;
+      }
+      // Numerical derivative of σ
+      function dsigma(x) {
+        const h = 0.0025;
+        return (sigma(x + h) - sigma(x - h)) / (2 * h);
+      }
+
+      // ---- DOM refs --------------------------------------------------------
+      const svg   = document.getElementById('toyStage');
+      const aRng  = document.getElementById('aRng');
+      const bRng  = document.getElementById('bRng');
+      const lock  = document.getElementById('lockChk');
+      const bRow  = document.getElementById('bRow');
+      const gsOut = document.getElementById('gsOut');
+      const gtOut = document.getElementById('gtOut');
+      const sumOut= document.getElementById('sumOut');
+      const runBtn= document.getElementById('runBtn');
+      const vmFill= document.getElementById('vmFill'), vdFill = document.getElementById('vdFill');
+      const vmNum = document.getElementById('vmNum'),  vdNum  = document.getElementById('vdNum');
+
+      // ---- SVG setup -------------------------------------------------------
+      const W = 720, H = 220;
+      const padL = 40, padR = 40, padT = 30, padB = 56;
+      const plotW = W - padL - padR, plotH = H - padT - padB;
+
+      const ns = 'http://www.w3.org/2000/svg';
+      function el(tag, attrs) {
+        const e = document.createElementNS(ns, tag);
+        for (const k in attrs) e.setAttribute(k, attrs[k]);
+        return e;
+      }
+      function xPix(x01) { return padL + x01 * plotW; }
+      function yPix(s)   { return padT + plotH - s * plotH * 0.55; }
+
+      // Build σ(x) curve
+      const ptsArr = [];
+      for (let i = 0; i <= 100; i++) {
+        const x = i / 100;
+        ptsArr.push(`${xPix(x).toFixed(2)},${yPix(sigma(x)).toFixed(2)}`);
+      }
+      // Static SVG elements
+      function buildStatic() {
+        // axis baseline
+        svg.appendChild(el('line', {
+          x1: padL, x2: W - padR,
+          y1: padT + plotH, y2: padT + plotH,
+          stroke: '#36393d', 'stroke-width': 1.2
+        }));
+        // segment label
+        const lbl = el('text', { x: W/2, y: H - 8, 'text-anchor': 'middle', fill: '#6b7280', 'font-size': 12 });
+        lbl.textContent = 'ray segment  (x along path)';
+        svg.appendChild(lbl);
+        // σ curve
+        svg.appendChild(el('polyline', {
+          points: ptsArr.join(' '),
+          fill: 'none', stroke: '#99583d', 'stroke-width': 2, opacity: 0.85
+        }));
+        // σ label
+        const slab = el('text', { x: padL - 6, y: padT + 8, 'text-anchor': 'end', fill: '#99583d', 'font-size': 12, 'font-style': 'italic' });
+        slab.textContent = 'σ(x)';
+        svg.appendChild(slab);
+      }
+      buildStatic();
+
+      // Dynamic group (probes + arrows) we redraw on update
+      const dyn = el('g', {});
+      svg.appendChild(dyn);
+
+      function clearDyn() { while (dyn.firstChild) dyn.removeChild(dyn.firstChild); }
+
+      function drawProbe(x01, color, label, sign) {
+        const x = xPix(x01);
+        const y0 = padT + plotH;
+        // shaft on the axis
+        dyn.appendChild(el('line', {
+          x1: x, x2: x, y1: y0 - 4, y2: y0 + 4,
+          stroke: color, 'stroke-width': 3
+        }));
+        // tag below
+        const t = el('text', {
+          x: x, y: y0 + 22, 'text-anchor': 'middle', fill: color, 'font-size': 12, 'font-weight': 700
+        });
+        t.textContent = label;
+        dyn.appendChild(t);
+        // arrow: magnitude ∝ ∂σ at probe, signed
+        const g = sign * dsigma(x01);
+        const amax = 1.6;
+        const k = Math.max(-1, Math.min(1, g / amax));
+        const len = k * plotH * 0.40;
+        const ay1 = y0 - 6;
+        const ay2 = y0 - 6 - len;
+        dyn.appendChild(el('line', {
+          x1: x, x2: x, y1: ay1, y2: ay2,
+          stroke: color, 'stroke-width': 2.5
+        }));
+        // arrowhead
+        const hs = 6;
+        const dir = len >= 0 ? -1 : 1;
+        const headY = ay2 + dir * hs;
+        dyn.appendChild(el('polygon', {
+          points: `${x-hs},${headY} ${x+hs},${headY} ${x},${ay2}`,
+          fill: color
+        }));
+        return g;
+      }
+
+      function update() {
+        clearDyn();
+        const a = parseInt(aRng.value, 10) / 1000;
+        const b = lock.checked ? a : parseInt(bRng.value, 10) / 1000;
+        if (lock.checked) { bRng.value = aRng.value; }
+        bRow.style.opacity = lock.checked ? 0.35 : 1;
+        bRng.disabled = lock.checked;
+
+        const gs = drawProbe(a, '#2f6ea3', 'A', +1);
+        const gt = drawProbe(b, '#b94a4a', 'B', -1);
+        const sum = gs + gt;
+
+        gsOut.textContent = (gs >= 0 ? '+' : '') + gs.toFixed(2);
+        gtOut.textContent = (gt >= 0 ? '+' : '') + gt.toFixed(2);
+        sumOut.textContent = (sum >= 0 ? '+' : '') + sum.toFixed(2);
+      }
+      aRng.addEventListener('input', update);
+      bRng.addEventListener('input', update);
+      lock.addEventListener('change', update);
+      update();
+
+      // ---- Variance demo --------------------------------------------------
+      function variance(mode, n) {
+        let sum = 0, sum2 = 0;
+        for (let i = 0; i < n; i++) {
+          const a = Math.random();
+          const b = (mode === 'match') ? a : Math.random();
+          const v = dsigma(a) - dsigma(b);
+          sum  += v;
+          sum2 += v * v;
+        }
+        const mean = sum / n;
+        return sum2 / n - mean * mean;
+      }
+
+      runBtn.addEventListener('click', () => {
+        const N = 200;
+        const vm = variance('match', N);
+        const vd = variance('drt',   N);
+        const vmax = Math.max(vm, vd, 1e-6);
+        vmFill.style.width = (100 * vm / vmax).toFixed(1) + '%';
+        vdFill.style.width = (100 * vd / vmax).toFixed(1) + '%';
+        vmNum.textContent = vm.toExponential(2);
+        vdNum.textContent = vd.toExponential(2);
+      });
+    })();
+  </script>
 </body>
 </html>

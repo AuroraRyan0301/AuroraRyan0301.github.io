@@ -113,7 +113,7 @@ redirect_from:
           Jingwang Ling, <span class="me">Ruihan Yu</span>, Feng Xu,
           Chun Du, Shuang Zhao
         </p>
-        <p class="pub__venue">ACM SIGGRAPH 2024</p>
+        <p class="pub__venue">ACM SIGGRAPH 2024 (Conference Track)</p>
         <p class="pub__links">
           <a href="https://nerfemitterpbir.github.io/">project page</a>
           <a href="https://arxiv.org/abs/2402.04829">arXiv</a>
