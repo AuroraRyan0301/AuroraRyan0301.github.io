@@ -149,23 +149,29 @@ sitemap: false
       font-size: 0.78rem; color: var(--color-muted); text-align: right;
       font-family: var(--font-mono); letter-spacing: 0.02em;
     }
+    /* Scene-row left cell: 'scene' label always visible, and (only when
+       Case N is active) a 🎲 / ▶ icon button pair to its LEFT — laid out
+       horizontally so the row height never grows. */
     .vbox__row-controls {
-      display: flex; flex-direction: column; align-items: flex-end;
-      gap: 0.25rem;
+      display: flex; flex-direction: row; align-items: center;
+      justify-content: flex-end; gap: 0.35rem;
+      height: 100%;
     }
-    /* random / start buttons are hidden unless the live case is active */
+    .vbox__row-controls .vbox__row-label { order: 3; }
     .vbox__row-controls button { display: none; }
-    .vbox__row-controls.live button { display: inline-block; }
+    .vbox__row-controls.live button { display: inline-flex;
+      align-items: center; justify-content: center;
+    }
     .vbox__row-controls button {
-      font-size: 0.72rem;
-      padding: 0.18rem 0.7rem;
+      font-size: 0.95rem; line-height: 1;
+      padding: 0.15rem 0.35rem;
+      min-width: 1.65rem;
       border-radius: 999px;
       background: #fff;
       border: 1px solid rgba(75,51,38,0.25);
       color: var(--color-muted);
       cursor: pointer;
       font-family: inherit;
-      letter-spacing: 0.02em;
     }
     .vbox__row-controls button:hover {
       border-color: var(--color-accent);
@@ -502,9 +508,9 @@ sitemap: false
 
           <div class="vbox__curves">
             <div class="vbox__row-controls">
+              <button id="randomSceneBtn" type="button" title="Generate a fresh random density / albedo">🎲</button>
+              <button id="startBtn"       type="button" title="Start / stop streaming variance estimates">▶</button>
               <span class="vbox__row-label">scene</span>
-              <button id="randomSceneBtn" type="button" title="Generate a fresh random density / albedo">⟳ random</button>
-              <button id="startBtn"       type="button" title="Start streaming variance estimates">▶ start</button>
             </div>
             <canvas id="curvesCanvas" width="720" height="74"></canvas>
             <div class="vbox__legend">
@@ -774,7 +780,7 @@ sitemap: false
 
       function setRunning(on) {
         running = on;
-        startBtn.textContent = on ? '■ stop' : '▶ start';
+        startBtn.textContent = on ? '■' : '▶';
         startBtn.classList.toggle('running', on);
       }
 
@@ -849,7 +855,7 @@ sitemap: false
         lastLive = null;
         drawCurves(scene.density, scene.albedoCurve);
         clearStrips();
-        statusEl.textContent = 'ready · click ▶ start';
+        statusEl.textContent = 'ready · click ▶';
       });
 
       startBtn.addEventListener('click', function () {
