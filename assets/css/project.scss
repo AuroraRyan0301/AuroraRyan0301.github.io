@@ -137,26 +137,21 @@ section.sect--frag-inner {
 .award__text {
   background-image: linear-gradient(
     90deg,
-    #e87a7a   0%,
-    #ee9b5d  14%,
-    #e3b258  28%,
-    #7fb878  42%,
-    #6ca6c8  57%,
-    #9a8ad0  71%,
-    #d586a6  85%,
-    #e87a7a 100%
+    #e87a7a, #ee9b5d, #e3b258, #7fb878,
+    #6ca6c8, #9a8ad0, #d586a6, #e87a7a
   );
-  background-size: 220% 100%;
+  background-size: 200% 100%;
+  background-repeat: repeat;
   background-position: 0% 50%;
   -webkit-background-clip: text;
           background-clip: text;
   color: transparent;
   -webkit-text-fill-color: transparent;
-  animation: award-flow 9s linear infinite;
+  animation: award-flow 12s linear infinite;
 }
 @keyframes award-flow {
-  0%   { background-position:   0% 50%; }
-  100% { background-position: 220% 50%; }
+  from { background-position:    0% 50%; }
+  to   { background-position: -200% 50%; }
 }
 @media (prefers-reduced-motion: reduce) {
   .award__text { animation: none; }
