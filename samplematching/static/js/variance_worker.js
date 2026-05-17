@@ -103,9 +103,6 @@ function gradEstimate(sigmaT, albedo, sigmaBar, rng, mode) {
     if (mode === 'sm') {
       const s = rng() * tClamped;
       s1 = segStart + s; s2 = s1;
-    } else if (mode === 'drt') {
-      s1 = segStart + rng() * tClamped;
-      s2 = segStart + rng() * tClamped;
     } else if (mode === 'ff') {
       const hi = segStart + tClamped;
       function ffOne() {
@@ -122,6 +119,84 @@ function gradEstimate(sigmaT, albedo, sigmaBar, rng, mode) {
 
     const hs = interp(albedo, s1) * Lnext;
     interpBwd(grad, s1, tClamped * hs);
+    interpBwd(grad, s2, tClamped * (-ht));
+  }
+  return grad;
+}
+
+/* ---- Paper-DRT (Nimier-David et al. 2022 List 1):
+ *      Weighted Reservoir Sampling along the ray with weights ∝ T(t).
+ *      The reservoir picks ONE position out of all delta-tracking probes,
+ *      with PDF proportional to T at that position. PDF(y) = T(y) / ∫T,
+ *      so the estimator 1/PDF · T(y) · α · L_s collapses to
+ *      W_T · α(y) · L_s(y)  where W_T = ∫₀^{X_MAX} T(t) dt is the
+ *      reservoir's running total weight. Trans term stays per-segment. */
+function paperDrtEstimate(sigmaT, albedo, sigmaBar, rng) {
+  const grad = new Float64Array(N);
+  const positions = buildPath(sigmaT, sigmaBar, rng);
+  const nb = positions.length - 1;
+  const L = backwardRadiance(positions, albedo);
+
+  // ---- scattering term : WRS ∝ T(t) along the ray ---------------------
+  // Walk via ratio-tracking-style steps with a majorant sigmaBar. Each
+  // step contributes weight T(t_i)·Δt to the reservoir. T accumulates as
+  // we go (no rejection, no early termination).
+  let tWalk = X_MIN;
+  let tau   = 0.0;          // running optical depth from X_MIN to tWalk
+  let wSum  = 0.0;          // ∫ T(t) dt so far
+  let yRes  = X_MIN;        // reservoir's currently-held position
+  let stepCount = 0;
+  while (tWalk < X_MAX && stepCount < 4096) {
+    stepCount++;
+    let u = rng();
+    if (u < 1e-10) u = 1e-10;
+    let dt = -Math.log(u) / sigmaBar;
+    let tNext = tWalk + dt;
+    if (tNext > X_MAX) { dt = X_MAX - tWalk; tNext = X_MAX; }
+    // midpoint approximation: σ at tWalk + dt/2, contribution to ∫T dt
+    const tMid = tWalk + 0.5 * dt;
+    const T_mid = Math.exp(-(tau + 0.5 * interp(sigmaT, tMid) * dt));
+    const w_i = T_mid * dt;
+    wSum += w_i;
+    // WRS swap: replace reservoir with this step's position w.p. w_i / wSum
+    if (rng() * wSum < w_i) {
+      // place reservoir at a uniform position within this step
+      yRes = tWalk + rng() * dt;
+    }
+    // advance optical depth
+    tau += interp(sigmaT, tMid) * dt;
+    tWalk = tNext;
+  }
+  // Now yRes is the reservoir sample with PDF ∝ T; wSum = ∫T dt.
+  const alpha_y = interp(albedo, yRes);
+  let segIdx = nb;
+  for (let j = 0; j < nb; j++) {
+    if (yRes < positions[j + 1]) { segIdx = j; break; }
+  }
+  const Lnext_scat = (segIdx < nb) ? L[segIdx + 1] : L_LIGHT;
+  // Estimator = (1/PDF) · T(y) · α(y) · L_s(y) = wSum · α(y) · L_s(y)
+  interpBwd(grad, yRes, wSum * alpha_y * Lnext_scat);
+
+  // ---- transmittance term : per-segment Eq.5 -------------------------
+  for (let j = 0; j <= nb; j++) {
+    const seg_start = positions[j];
+    const seg_end   = j < nb ? positions[j + 1] : X_MAX;
+    const seg_len   = seg_end - seg_start;
+    if (seg_len <= 0) continue;
+    const Lnext = j < nb ? L[j + 1] : L_LIGHT;
+
+    let tAbs = seg_start;
+    let segScat = false;
+    for (let step = 0; step < 4096; step++) {
+      let u = rng();
+      if (u < 1e-10) u = 1e-10;
+      tAbs += -Math.log(u) / sigmaBar;
+      if (tAbs >= seg_end) break;
+      if (rng() < interp(sigmaT, tAbs) / sigmaBar) { segScat = true; break; }
+    }
+    const tClamped = Math.min(tAbs - seg_start, seg_len);
+    const ht = segScat ? interp(albedo, tAbs) * Lnext : Lnext;
+    const s2 = seg_start + rng() * tClamped;
     interpBwd(grad, s2, tClamped * (-ht));
   }
   return grad;
@@ -214,9 +289,10 @@ self.addEventListener('message', (e) => {
       const sppAvg = new Float64Array(N);
       const rng = makeRng(seed0 * 1009 + r * 31337 + modeHash(mode));
       for (let s = 0; s < SPP; s++) {
-        const g = (mode === 'nm')
-                  ? twoPathEstimate(sigmaT, albedo, sigmaBar, rng)
-                  : gradEstimate(sigmaT, albedo, sigmaBar, rng, mode);
+        let g;
+        if      (mode === 'nm' ) g = twoPathEstimate(sigmaT, albedo, sigmaBar, rng);
+        else if (mode === 'drt') g = paperDrtEstimate(sigmaT, albedo, sigmaBar, rng);
+        else                     g = gradEstimate    (sigmaT, albedo, sigmaBar, rng, mode);
         for (let i = 0; i < N; i++) sppAvg[i] += g[i];
       }
       for (let i = 0; i < N; i++) sppAvg[i] /= SPP;

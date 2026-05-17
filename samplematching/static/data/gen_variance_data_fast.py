@@ -142,6 +142,100 @@ def _grad_one(sigma_t, albedo, sigma_bar, state, mode, out,
 
 
 @njit(cache=True, fastmath=True)
+def _paper_drt(sigma_t, albedo, sigma_bar, state, out,
+               x_min, x_max, dx, N, max_bounces, L_light):
+    """Paper-DRT (Nimier-David et al. 2022, List 1) via weighted reservoir
+    sampling along the ray. WRS gives a single scat-sample y with PDF
+    ∝ T(y); contribution simplifies to (∫T)·α(y)·L_s(y)·∂σ_t.
+    Trans term stays as Eq.5 per segment."""
+    # ---- forward path (delta tracking) ------------------------------
+    positions = np.empty(max_bounces + 1, dtype=np.float64)
+    positions[0] = x_min
+    n_b = 0
+    x = x_min
+    for b in range(max_bounces):
+        t_abs = x
+        scattered = False
+        for step in range(4096):
+            u = _pcg(state)
+            if u < 1e-10: u = 1e-10
+            t_abs += -math.log(u) / sigma_bar
+            if t_abs >= x_max: break
+            sig = _interp(sigma_t, t_abs, x_min, dx, N)
+            if _pcg(state) < sig / sigma_bar:
+                scattered = True
+                break
+        if not scattered: break
+        n_b += 1
+        positions[n_b] = t_abs
+        x = t_abs
+
+    L = np.empty(n_b + 1, dtype=np.float64)
+    L[n_b] = L_light
+    for j in range(n_b - 1, -1, -1):
+        L[j] = _interp(albedo, positions[j + 1], x_min, dx, N) * L[j + 1]
+
+    # ---- WRS ∝ T(t) along the ray ----------------------------------
+    t_walk = x_min
+    tau    = 0.0
+    w_sum  = 0.0
+    y_res  = x_min
+    for stepc in range(4096):
+        if t_walk >= x_max: break
+        u = _pcg(state)
+        if u < 1e-10: u = 1e-10
+        dt = -math.log(u) / sigma_bar
+        t_next = t_walk + dt
+        if t_next > x_max:
+            dt = x_max - t_walk
+            t_next = x_max
+        t_mid = t_walk + 0.5 * dt
+        sig_mid = _interp(sigma_t, t_mid, x_min, dx, N)
+        T_mid = math.exp(-(tau + 0.5 * sig_mid * dt))
+        w_i = T_mid * dt
+        w_sum += w_i
+        if _pcg(state) * w_sum < w_i:
+            y_res = t_walk + _pcg(state) * dt
+        tau += sig_mid * dt
+        t_walk = t_next
+
+    # scat contribution = w_sum * α(y) * L_s(y)
+    alpha_y = _interp(albedo, y_res, x_min, dx, N)
+    # locate segment containing y_res
+    seg_idx = n_b
+    for j in range(n_b):
+        if y_res < positions[j + 1]:
+            seg_idx = j
+            break
+    L_next_scat = L[seg_idx + 1] if seg_idx < n_b else L_light
+    _interp_bwd(out, y_res, w_sum * alpha_y * L_next_scat, x_min, dx, N)
+
+    # ---- trans term per segment (Eq.5) -----------------------------
+    for j in range(n_b + 1):
+        seg_start = positions[j]
+        seg_end = positions[j + 1] if j < n_b else x_max
+        seg_len = seg_end - seg_start
+        if seg_len <= 0: continue
+        L_next = L[j + 1] if j < n_b else L_light
+
+        t_abs = seg_start
+        seg_scat = False
+        for step in range(4096):
+            u = _pcg(state)
+            if u < 1e-10: u = 1e-10
+            t_abs += -math.log(u) / sigma_bar
+            if t_abs >= seg_end: break
+            sig = _interp(sigma_t, t_abs, x_min, dx, N)
+            if _pcg(state) < sig / sigma_bar:
+                seg_scat = True
+                break
+        t_clamped = min(t_abs - seg_start, seg_len)
+        h_t = _interp(albedo, t_abs, x_min, dx, N) * L_next if seg_scat else L_next
+        s2 = seg_start + _pcg(state) * t_clamped
+        _interp_bwd(out, s2, t_clamped * (-h_t), x_min, dx, N)
+
+
+@njit(cache=True, fastmath=True)
 def _grad_one_term(sigma_t, albedo, sigma_bar, state, term, out,
                    x_min, x_max, dx, N, max_bounces, L_light):
     """One-path estimator that accumulates only the scat (term=0) or
@@ -219,6 +313,9 @@ def _variance_pass(sigma_t, albedo, sigma_bar, mode, R, SPP, seed_base,
                                x_min, x_max, dx, N, max_bounces, L_light)
                 _grad_one_term(sigma_t, albedo, sigma_bar, state, 1, one_buf,
                                x_min, x_max, dx, N, max_bounces, L_light)
+            elif mode == MODE_DRT:
+                _paper_drt(sigma_t, albedo, sigma_bar, state, one_buf,
+                           x_min, x_max, dx, N, max_bounces, L_light)
             else:
                 _grad_one(sigma_t, albedo, sigma_bar, state, mode, one_buf,
                           x_min, x_max, dx, N, max_bounces, L_light)
