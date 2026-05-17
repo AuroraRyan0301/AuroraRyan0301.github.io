@@ -251,10 +251,13 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 .pub__award {
   display: block;
   margin-top: 0.15rem;
-  font-size: 0.88rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 400;
   font-style: normal;
-  color: #c8541e;
+  color: #d97706;
+  background: none;
+  border: none;
+  padding: 0;
 }
 .pub__award::before { content: "★ "; }
 
