@@ -100,17 +100,18 @@ sitemap: false
       border-radius: 4px;
     }
     .vbox__strategies figcaption {
-      margin-top: 0.3rem;
+      margin-top: 0.9rem;
       font-size: 0.78rem;
-      line-height: 1.25;
+      line-height: 1.4;
     }
     .vbox__strategies figcaption strong {
       display: block; color: var(--color-heading); font-weight: 700;
+      margin-bottom: 0.35rem;
     }
     .vbox__strategies figcaption span {
       color: var(--color-muted);
       font-size: 0.78rem;
-      line-height: 1.35;
+      line-height: 1.5;
       display: inline-block;
     }
     /* KaTeX inline math inside the small figcaptions should sit at the
@@ -400,7 +401,7 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>DRT</strong>
-                <span>\(p_{\mathrm{scat}}(y) \propto T(y)\) on \([x_{j-1},\,x_j^{\bot}]\)</span>
+                <span>\(p_{\mathrm{scat}}(y) \propto T(y)\)<br>on \([x_{j-1},\,x_j^{\bot}]\)</span>
               </figcaption>
             </figure>
 
@@ -427,7 +428,7 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>Unlock SM</strong>
-                <span>\(p_{\mathrm{scat}}(y \mid x_j) = 1 / \|x_j - x_{j-1}\|\)</span>
+                <span>\(p_{\mathrm{scat}}(y \mid x_j) = \frac{1}{\|x_j - x_{j-1}\|}\)</span>
               </figcaption>
             </figure>
 
@@ -457,7 +458,7 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>SM (locked)</strong>
-                <span>\(p_{\mathrm{scat}}(y \mid x_j) = 1 / \|x_j - x_{j-1}\|\)</span>
+                <span>\(p_{\mathrm{scat}}(y \mid x_j) = \frac{1}{\|x_j - x_{j-1}\|}\)</span>
               </figcaption>
             </figure>
           </div>
