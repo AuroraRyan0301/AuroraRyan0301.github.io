@@ -112,9 +112,10 @@ def gradient_estimate(sigma_t, albedo, sigma_bar, rng, mode):
 
     mode:
       'sm'  - sample matching, s1 = s2 (locked)
-      'nm'  - their reformulation but s1 ⊥ s2 (no lock)  ← what drt.slang does
-      'drt' - vanilla DRT: no s splitting; use delta-tracked t for *both*
-              scattering and transmittance terms with no separate uniform draw.
+      'drt' - their reformulation but s1 ⊥ s2 (no lock) — exactly what
+              drt.slang in the repo does.  Path is shared between the two
+              terms; only the segment-local s decorrelates.
+      (the 'nm' / two-independent-paths case is a separate function below)
     """
     g = np.zeros(N)
 
@@ -177,17 +178,8 @@ def gradient_estimate(sigma_t, albedo, sigma_bar, rng, mode):
             s = rng.random() * t_clamped
             s1 = seg_start + s
             s2 = s1
-        elif mode == 'nm':
-            s1 = seg_start + rng.random() * t_clamped
-            s2 = seg_start + rng.random() * t_clamped
         elif mode == 'drt':
-            # vanilla: no s draw -- gradient driven by delta-tracked t only.
-            # Use delta-tracked t for *both* terms, but each on its own
-            # *independent* path replay would be the textbook DRT. To keep
-            # cost matched (1 path/spp), we re-use the same t. This is biased
-            # against the reformulation but ungauntleted in variance for the
-            # un-coupled term; in practice it sits much worse than NM.
-            s1 = t_abs if seg_scat else seg_start + 0.5 * t_clamped
+            s1 = seg_start + rng.random() * t_clamped
             s2 = seg_start + rng.random() * t_clamped
         else:
             raise ValueError(mode)
@@ -199,6 +191,71 @@ def gradient_estimate(sigma_t, albedo, sigma_bar, rng, mode):
         interp_bwd(g, s2, trans_val)
     return g
 
+
+def two_path_estimate(sigma_t, albedo, sigma_bar, rng):
+    """Sample-Not-Matched estimator.
+
+    Run *two independent path replays*.  Path 1 contributes only the
+    scattering term, path 2 contributes only the transmittance term.  Each
+    path is unbiased for its own term, so the sum is unbiased for the full
+    ∂L/∂σ_t -- but the two terms no longer share path structure at all, so
+    the negative correlation that helped DRT is gone too.
+    """
+    g = np.zeros(N)
+
+    def _one_path(term):
+        # forward delta-track
+        positions = [X_MIN]
+        x = X_MIN
+        for _ in range(MAX_BOUNCES):
+            t_abs = x; scattered = False
+            for _ in range(4096):
+                u = rng.random()
+                if u < 1e-10: u = 1e-10
+                t_abs += -math.log(u) / sigma_bar
+                if t_abs >= X_MAX: break
+                if rng.random() < interp(sigma_t, t_abs) / sigma_bar:
+                    scattered = True; break
+            if not scattered: break
+            positions.append(t_abs); x = t_abs
+        n_b = len(positions) - 1
+
+        # backward radiance
+        L = [0.0] * (n_b + 1)
+        L[n_b] = L_LIGHT
+        for j in range(n_b - 1, -1, -1):
+            L[j] = interp(albedo, positions[j + 1]) * L[j + 1]
+
+        # per-segment, accumulate only the requested term
+        for j in range(n_b + 1):
+            seg_start = positions[j]
+            seg_end   = positions[j + 1] if j < n_b else X_MAX
+            seg_len   = seg_end - seg_start
+            if seg_len <= 0: continue
+            L_next = L[j + 1] if j < n_b else L_LIGHT
+
+            t_abs = seg_start; seg_scat = False
+            for _ in range(4096):
+                u = rng.random()
+                if u < 1e-10: u = 1e-10
+                t_abs += -math.log(u) / sigma_bar
+                if t_abs >= seg_end: break
+                if rng.random() < interp(sigma_t, t_abs) / sigma_bar:
+                    seg_scat = True; break
+            t_clamped = min(t_abs - seg_start, seg_len)
+            s = seg_start + rng.random() * t_clamped
+
+            if term == 'scat':
+                h_s = interp(albedo, s) * L_next
+                interp_bwd(g, s, t_clamped * h_s)
+            else:  # 'trans'
+                h_t = interp(albedo, t_abs) * L_next if seg_scat else L_next
+                interp_bwd(g, s, t_clamped * (-h_t))
+
+    _one_path('scat')
+    _one_path('trans')
+    return g
+
 # ---------------- variance pre-computation ----------------------------------
 
 def per_cell_variance(sigma_t, albedo, sigma_bar, mode, seed_base):
@@ -208,10 +265,27 @@ def per_cell_variance(sigma_t, albedo, sigma_bar, mode, seed_base):
     for r in range(R):
         rng = np.random.default_rng(seed_base + r * 7919)
         acc = np.zeros(N)
-        for s in range(SPP):
-            acc += gradient_estimate(sigma_t, albedo, sigma_bar, rng, mode)
+        for _ in range(SPP):
+            if mode == 'nm':
+                acc += two_path_estimate(sigma_t, albedo, sigma_bar, rng)
+            else:
+                acc += gradient_estimate(sigma_t, albedo, sigma_bar, rng, mode)
         estimates[r] = acc / SPP
     return estimates.var(axis=0)
+
+def per_cell_mean(sigma_t, albedo, sigma_bar, mode, seed_base):
+    """For sanity-checking unbiasedness: mean estimate across R*SPP samples."""
+    acc = np.zeros(N)
+    total = 0
+    for r in range(R):
+        rng = np.random.default_rng(seed_base + r * 7919)
+        for _ in range(SPP):
+            if mode == 'nm':
+                acc += two_path_estimate(sigma_t, albedo, sigma_bar, rng)
+            else:
+                acc += gradient_estimate(sigma_t, albedo, sigma_bar, rng, mode)
+            total += 1
+    return acc / total
 
 # ---------------- random case generators ------------------------------------
 
@@ -257,15 +331,17 @@ def main():
             "gt":      gt.tolist(),
         }
 
-        for mode in ("sm", "nm"):
+        for mode in ("sm", "drt", "nm"):
             print(f"  running {mode.upper()}  ({R} reps × {SPP} spp) ...")
             var = per_cell_variance(sigma_t, albedo, sigma_bar, mode,
                                     seed_base=10_000 * (c + 1) + hash(mode) % 997)
             case[f"var_{mode}"] = var.tolist()
             print(f"    mean per-cell variance = {var.mean():.3e}")
 
-        # shared colormap max so the two strips compare visually
-        case["vmax"] = max(max(case["var_sm"]), max(case["var_nm"]))
+        # shared colormap max so all strips compare visually
+        case["vmax"] = max(max(case["var_sm"]),
+                           max(case["var_drt"]),
+                           max(case["var_nm"]))
         out_cases.append(case)
 
     out = {"N": N, "x_min": X_MIN, "x_max": X_MAX,

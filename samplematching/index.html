@@ -263,18 +263,30 @@ sitemap: false
     </section>
 
     <section id="toy" class="sect">
-      <h2 class="subhead">Per-grid-cell variance, locked vs not locked</h2>
+      <h2 class="subhead">Per-grid-cell variance, SM vs DRT vs Sample not matched</h2>
       <div class="prose" style="margin-bottom: 1.4rem;">
         <p>
           We pick three random 1-D scenes &mdash; each a heterogeneous density σ<sub>t</sub>
-          and albedo on a fixed N=128 grid &mdash; compute the ground-truth ∂L/∂σ<sub>t</sub>
-          by finite differences against a high-resolution ray-march, then run the
-          two estimators at <strong>128 spp</strong> many times and record the
-          variance at every grid cell. The strip below each scene is that
-          variance painted along the grid; brighter colour means the estimator
-          is noisier at that cell. Locking the two probes (sample matching) is
-          uniformly tighter than letting them wander independently.
+          and albedo on a fixed N=128 grid &mdash; and run three unbiased
+          estimators at <strong>128 spp</strong> many times, recording the
+          variance at every grid cell. Each strip below paints that variance
+          along the grid: brighter colour means the estimator is noisier at
+          that cell.
         </p>
+        <ul style="margin: 0 0 0 1.2rem; padding:0; font-size:0.92rem;">
+          <li><strong>SM (locked)</strong>: one shared path, one shared
+            position <em>s</em> drives both the scattering and the
+            transmittance gradient terms (<em>s</em><sub>1</sub> = <em>s</em><sub>2</sub>).</li>
+          <li><strong>DRT</strong>: one shared path, but the two terms each
+            draw their own uniform <em>s</em> within the segment
+            (<em>s</em><sub>1</sub> ⊥ <em>s</em><sub>2</sub>); this is what
+            <code>drt.slang</code> in the repo does.</li>
+          <li><strong>Sample not matched</strong>: <em>two independent path
+            replays</em> per sample &mdash; path 1 contributes only the
+            scattering term, path 2 only the transmittance. Each path is
+            unbiased for its own term, so the sum is still unbiased, but no
+            correlation survives between scat and trans.</li>
+        </ul>
       </div>
 
       <div class="toy" id="toy">
@@ -302,7 +314,11 @@ sitemap: false
             <canvas class="vbox__strip-canvas" id="stripSM" width="720" height="22"></canvas>
           </div>
           <div class="vbox__strip">
-            <span class="vbox__row-label">SM (not&nbsp;locked)</span>
+            <span class="vbox__row-label">DRT</span>
+            <canvas class="vbox__strip-canvas" id="stripDRT" width="720" height="22"></canvas>
+          </div>
+          <div class="vbox__strip">
+            <span class="vbox__row-label">Sample not matched</span>
             <canvas class="vbox__strip-canvas" id="stripNM" width="720" height="22"></canvas>
           </div>
 
@@ -350,8 +366,9 @@ sitemap: false
     // ====== Grid-variance comparison (precomputed) ===================
     (function () {
       const url = '{{ "/samplematching/static/data/variance_data.json" | relative_url }}';
-      const stripSM = document.getElementById('stripSM');
-      const stripNM = document.getElementById('stripNM');
+      const stripSM  = document.getElementById('stripSM');
+      const stripDRT = document.getElementById('stripDRT');
+      const stripNM  = document.getElementById('stripNM');
       const curves  = document.getElementById('curvesCanvas');
       const cbar    = document.getElementById('cbarCanvas');
       const caseRow = document.getElementById('vboxCases');
@@ -459,8 +476,9 @@ sitemap: false
         if (!data) return;
         const c = data.cases[activeCase];
         drawCurves(c.density, c.albedo);
-        drawStrip(stripSM, c.var_sm, c.vmax);
-        drawStrip(stripNM, c.var_nm, c.vmax);
+        drawStrip(stripSM,  c.var_sm,  c.vmax);
+        drawStrip(stripDRT, c.var_drt, c.vmax);
+        drawStrip(stripNM,  c.var_nm,  c.vmax);
       }
 
       fetch(url).then(r => r.json()).then(d => { data = d; render(); })
