@@ -18,6 +18,9 @@ redirect_from:
           I am an <strong>M2 student</strong> in
           <a href="https://cgenglab.github.io/en/"><strong>Umetani Lab</strong></a>
           at <strong>The University of Tokyo</strong>.
+          Before that, I received a B.S. in
+          <strong>Physics and Mathematics</strong> from the
+          Department of Physics, <strong>Tsinghua University</strong>.
         </p>
         <p>
           I am fortunate to collaborate with Prof.
