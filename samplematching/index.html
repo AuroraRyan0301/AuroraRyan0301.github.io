@@ -221,20 +221,6 @@ sitemap: false
           </label>
         </div>
 
-        <div class="toy__readout">
-          <div class="cell" style="background:rgba(217,107,107,0.12);">
-            Background transmission&nbsp;<small>(red, &minus; sign)</small>
-            <strong id="redOut" style="color:#b94a4a;">1.00</strong>
-          </div>
-          <div class="cell" style="background:rgba(82,134,181,0.12);">
-            Off-axis in-scattering&nbsp;<small>(blue, + sign)</small>
-            <strong id="blueOut" style="color:#2f6ea3;">0.00</strong>
-          </div>
-          <div class="cell">
-            Camera radiance&nbsp;<small>(what it sees)</small>
-            <strong id="camOut">1.00</strong>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -501,11 +487,8 @@ sitemap: false
 
     // ====== Physical-intuition slider toy ============================
     (function () {
-      const svg     = document.getElementById('physStage');
-      const sigRng  = document.getElementById('sigmaRng');
-      const redOut  = document.getElementById('redOut');
-      const blueOut = document.getElementById('blueOut');
-      const camOut  = document.getElementById('camOut');
+      const svg    = document.getElementById('physStage');
+      const sigRng = document.getElementById('sigmaRng');
       if (!svg) return;
 
       const ns = 'http://www.w3.org/2000/svg';
@@ -656,11 +639,6 @@ sitemap: false
         // In-scattering grows roughly linearly with σ_t (under the diffusion picture),
         // saturating as the medium becomes opaque (path-integrated).
         const scatter = (1 - Math.exp(-1.7 * s)) * 0.9;
-
-        // Update readouts
-        redOut.textContent  = transmission.toFixed(2);
-        blueOut.textContent = scatter.toFixed(2);
-        camOut.textContent  = (transmission + scatter).toFixed(2);
 
         // Trunk colour: red when transmission dominates, blue when scattering dominates.
         // Mixing weight = scatter / (transmission + scatter)
