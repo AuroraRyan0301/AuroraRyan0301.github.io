@@ -207,8 +207,9 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 
 .pub__thumb img {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
   display: block;
 }
 
