@@ -1,0 +1,166 @@
+---
+layout: null
+permalink: /2dgh/
+sitemap: false
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2DGH: 2D Gaussian-Hermite Splatting</title>
+  <meta name="description" content="2D Gaussian-Hermite Splatting (2DGH) replaces the isotropic Gaussian primitive with a Gaussian-Hermite kernel, capturing sharper edges and improving both geometry reconstruction and novel-view synthesis. IEEE TVCG 2025.">
+  <link rel="icon" type="image/svg+xml" href="{{ '/images/favicon.svg' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/project.css' | relative_url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar__inner">
+      <a class="topbar__brand" href="{{ '/' | relative_url }}">&larr; Ruihan Yu</a>
+      <nav class="topbar__nav">
+        <a href="#abstract">Abstract</a>
+        <a href="#toy">Toy</a>
+        <a href="#results">Results</a>
+        <a href="#bibtex">BibTeX</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+
+    <section class="hero">
+      <p class="eyebrow">IEEE Transactions on Visualization and Computer Graphics &nbsp;&middot;&nbsp; 2025</p>
+      <h1 class="hero__title">
+        2DGH: 2D Gaussian-Hermite Splatting for<br>
+        High-quality Rendering and Better Geometry Features
+      </h1>
+
+      <p class="hero__authors">
+        <a class="me" href="{{ '/' | relative_url }}">Ruihan Yu</a><sup>1,*</sup> &middot;
+        Tianyu Huang<sup>2,*</sup> &middot;
+        Jingwang Ling<sup>2</sup> &middot;
+        Feng Xu<sup>2,&dagger;</sup>
+      </p>
+      <p class="hero__affil">
+        <sup>1</sup>Department of Physics, Tsinghua University &nbsp;&nbsp;
+        <sup>2</sup>School of Software &amp; BNRist, Tsinghua University<br>
+        <span style="font-size:0.8rem;"><sup>*</sup>Equal contribution &nbsp;&middot;&nbsp; <sup>&dagger;</sup>Corresponding author</span>
+      </p>
+
+      <div class="btn-row">
+        <a class="btn" href="https://ieeexplore.ieee.org/document/11204833/">IEEE TVCG</a>
+        <a class="btn" href="https://arxiv.org/abs/2408.16982">arXiv</a>
+        <a class="btn btn--disabled" aria-disabled="true">Code (soon)</a>
+      </div>
+    </section>
+
+    <section class="teaser">
+      <figure>
+        <img src="{{ '/2dgh/static/images/teaser.png' | relative_url }}"
+             alt="2DGH teaser: color/normal/depth comparison against 2DGS">
+        <figcaption>
+          Replacing the Gaussian primitive with a Gaussian-Hermite kernel yields sharper edges, more
+          accurate normals, and cleaner depth &mdash; while keeping the splatting pipeline intact.
+        </figcaption>
+      </figure>
+    </section>
+
+    <section id="abstract" class="sect sect--frag-inner">
+      <h2 class="subhead">Abstract</h2>
+      <div class="prose">
+        <p>
+          2D Gaussian Splatting has recently emerged as a significant method in 3D reconstruction,
+          enabling novel view synthesis and geometry reconstruction simultaneously. While the
+          well-known Gaussian kernel is broadly used, its lack of anisotropy and deformation ability
+          leads to dim and vague edges at object silhouettes, limiting the reconstruction quality of
+          current Gaussian splatting methods.
+        </p>
+        <p>
+          To enhance the representation power, we draw inspiration from quantum physics and propose
+          to use the <strong>Gaussian-Hermite kernel</strong> as the new primitive in Gaussian
+          splatting. The new kernel takes a unified mathematical form and extends the Gaussian
+          function, which serves as the zero-rank special case in the updated general formulation.
+        </p>
+        <p>
+          Our experiments demonstrate that the proposed Gaussian-Hermite kernel achieves improved
+          performance over traditional Gaussian Splatting kernels on both geometry reconstruction
+          and novel-view synthesis. On the <strong>DTU</strong> dataset, our method yields more
+          accurate geometry reconstruction; on <strong>MipNeRF360</strong> and our customized
+          <strong>Detail</strong> dataset, it achieves better novel-view synthesis &mdash;
+          highlighting the potential of the Gaussian-Hermite kernel for high-quality 3D
+          reconstruction and rendering.
+        </p>
+      </div>
+    </section>
+
+    <section id="toy" class="sect">
+      <h2 class="subhead">Triangle Fitting Toy</h2>
+      <div class="prose">
+        <p>
+          A simple sanity check: fit a triangle with two primitives. Two rank-5 Gaussian-Hermites
+          recover the sharp edges; two original Gaussians can only suggest the rough silhouette.
+          This is the failure mode that motivates the new primitive on real scenes.
+        </p>
+      </div>
+      <div class="figgrid">
+        <figure>
+          <img src="{{ '/2dgh/static/images/toy.png' | relative_url }}"
+               alt="Toy: triangle fitted with Gaussian-Hermite vs original Gaussian">
+          <figcaption>
+            (a) Ground truth &nbsp;&middot;&nbsp; (b) Two rank-5 Gaussian-Hermites &nbsp;&middot;&nbsp; (c) Two original Gaussians.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="results" class="sect sect--frag-inner">
+      <h2 class="subhead">Method &amp; Results</h2>
+      <div class="prose">
+        <p>
+          The Gaussian-Hermite kernel is a product of a Gaussian and a Hermite polynomial in 2D &mdash;
+          the rank parameter <em>(M, N)</em> controls how many Hermite modes contribute, with rank
+          zero collapsing back to the standard Gaussian. The optimisation pipeline (initialisation,
+          densification, rasterisation) is otherwise compatible with 2D Gaussian Splatting.
+        </p>
+      </div>
+      <div class="figgrid">
+        <figure>
+          <img src="{{ '/2dgh/static/images/hermite_series.png' | relative_url }}"
+               alt="Gaussian-Hermite basis functions">
+          <figcaption>The first few Gaussian-Hermite basis functions used as primitives.</figcaption>
+        </figure>
+        <figure>
+          <img src="{{ '/2dgh/static/images/coeff_pyramid.png' | relative_url }}"
+               alt="Coefficient pyramid">
+          <figcaption>
+            Coefficient pyramid &mdash; coarse modes are learned first, finer modes added later for stability.
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section id="bibtex" class="sect">
+      <h2 class="subhead">BibTeX</h2>
+      <div class="bibtex">
+<pre>@article{yu2025gaussianhermite,
+  title   = {2DGH: 2D Gaussian-Hermite Splatting for High-quality Rendering
+             and Better Geometry Features},
+  author  = {Yu, Ruihan and Huang, Tianyu and Ling, Jingwang and Xu, Feng},
+  journal = {IEEE Transactions on Visualization and Computer Graphics},
+  year    = {2025}
+}</pre>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <p>&copy; 2025 Ruihan Yu &nbsp;&middot;&nbsp; <a href="{{ '/' | relative_url }}">Back to homepage</a></p>
+  </footer>
+
+</body>
+</html>

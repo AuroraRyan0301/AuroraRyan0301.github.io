@@ -50,7 +50,7 @@ redirect_from:
 
     <article class="pub">
       <div class="pub__thumb">
-        <img src="{{ '/images/sample_matching_thumb.png' | relative_url }}" alt="Sample Matching teaser (Ours panel)">
+        <img src="{{ '/images/sample_matching_thumb.jpg' | relative_url }}" alt="Sample Matching teaser (Ours panel)">
       </div>
       <div class="pub__body">
         <h3 class="pub__title">Sample Matching for Joint Extinction Gradient Estimation in Differentiable Volume Rendering</h3>
@@ -60,7 +60,7 @@ redirect_from:
         </p>
         <p class="pub__venue">ACM Transactions on Graphics (TOG), 2026</p>
         <p class="pub__links">
-          <a href="https://auroraryan0301.github.io/samplematching.github.io/">project page</a>
+          <a href="{{ '/samplematching/' | relative_url }}">project page</a>
           <a href="#">paper (soon)</a>
           <a href="#">code (soon)</a>
         </p>
@@ -85,16 +85,20 @@ redirect_from:
     </article>
 
     <article class="pub">
-      <div class="pub__thumb pub__thumb--empty">no preview yet</div>
+      <div class="pub__thumb">
+        <img src="{{ '/images/2dgh_thumb.png' | relative_url }}" alt="2DGH triangle fitting comparison">
+      </div>
       <div class="pub__body">
-        <h3 class="pub__title">2DGH: 2D Gaussian-Hermite Splatting for High-quality Rendering and Better Geometry Reconstruction</h3>
+        <h3 class="pub__title">2DGH: 2D Gaussian-Hermite Splatting for High-quality Rendering and Better Geometry Features</h3>
         <p class="pub__authors">
-          <span class="me">Ruihan Yu</span>, Tianyu Huang, Jingwang Ling, Feng Xu
+          <span class="me">Ruihan Yu</span>*, Tianyu Huang*, Jingwang Ling, Feng Xu
         </p>
         <p class="pub__venue">IEEE Transactions on Visualization and Computer Graphics (TVCG), 2025</p>
         <p class="pub__links">
+          <a href="{{ '/2dgh/' | relative_url }}">project page</a>
           <a href="https://ieeexplore.ieee.org/document/11204833/">IEEE</a>
           <a href="https://arxiv.org/abs/2408.16982">arXiv</a>
+          <a href="#">code (soon)</a>
         </p>
       </div>
     </article>

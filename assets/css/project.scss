@@ -1,0 +1,268 @@
+---
+# Front-matter so Jekyll processes this with Sass.
+---
+
+/* ============================================================================
+ * Shared project-page styles — used by /samplematching/ and /2dgh/.
+ * Color palette + typography match the personal homepage (rshi.top inspired).
+ * Layout structure mirrors the vvmc-style scrollable section list.
+ * ========================================================================= */
+
+:root {
+  --color-text: #4b3326;
+  --color-muted: #6b7280;
+  --color-accent: #99583d;
+  --color-accent-soft: #c97a59;
+  --color-heading: #36393d;
+  --color-bg: #ffffff;
+  --color-frag: #dfdace30;
+  --color-frag-l: #fffdfa;
+  --color-code-bg: #f6f1ec;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+               sans-serif;
+  --font-serif: "Libre Caslon Text", ui-serif, Georgia, Cambria,
+                "Times New Roman", Times, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+               "Liberation Mono", "Courier New", monospace;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  scroll-padding-top: 4.5rem;
+}
+
+body { margin: 0; }
+
+a {
+  color: var(--color-accent);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+a:hover { border-bottom-color: var(--color-accent); }
+
+h1, h2, h3, h4 { color: var(--color-heading); margin: 0; font-weight: 700; }
+p { margin: 0 0 1rem 0; }
+
+img, video { max-width: 100%; height: auto; display: block; }
+
+/* ---- Top nav ----------------------------------------------------------- */
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(180%) blur(10px);
+  -webkit-backdrop-filter: saturate(180%) blur(10px);
+  border-bottom: 1px solid rgba(75, 51, 38, 0.07);
+}
+.topbar__inner {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.topbar__brand {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-heading);
+}
+.topbar__brand:hover { border-bottom: none; color: var(--color-accent); }
+.topbar__nav {
+  display: flex;
+  gap: 1.25rem;
+  font-size: 0.88rem;
+}
+.topbar__nav a { color: var(--color-text); }
+.topbar__nav a:hover { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+
+/* ---- Page scaffold ----------------------------------------------------- */
+
+main { max-width: 56rem; margin: 0 auto; padding: 0 1.5rem; }
+section.sect { padding: 3rem 0; }
+section.sect--frag { background: var(--color-frag); }
+section.sect--frag-inner {
+  background: var(--color-frag);
+  margin: 0 -1.5rem;
+  padding: 3rem 1.5rem;
+}
+
+.subhead {
+  font-family: var(--font-serif);
+  text-align: center;
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  margin-bottom: 0.5rem;
+}
+
+/* ---- Hero -------------------------------------------------------------- */
+
+.hero {
+  text-align: center;
+  padding: 4rem 0 2rem;
+}
+.hero__title {
+  font-family: var(--font-serif);
+  font-size: 2.1rem;
+  line-height: 1.2;
+  margin-bottom: 1.5rem;
+  color: var(--color-heading);
+}
+.hero__authors {
+  font-size: 1rem;
+  margin-bottom: 0.3rem;
+  color: var(--color-text);
+}
+.hero__authors .me { color: var(--color-accent); font-weight: 600; }
+.hero__authors a { color: var(--color-text); border-bottom: 1px dotted rgba(75, 51, 38, 0.4); }
+.hero__authors a:hover { color: var(--color-accent); border-bottom-color: var(--color-accent); }
+.hero__affil {
+  font-size: 0.92rem;
+  color: var(--color-muted);
+  margin-bottom: 0.6rem;
+}
+.hero__venue {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--color-heading);
+  margin: 0.6rem 0 1.6rem;
+}
+
+.btn-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1rem;
+  font-size: 0.9rem;
+  color: var(--color-accent);
+  background: #fff;
+  border: 1px solid rgba(153, 88, 61, 0.4);
+  border-radius: 999px;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+.btn:hover {
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+.btn--disabled {
+  color: var(--color-muted);
+  border-color: rgba(107, 114, 128, 0.3);
+  background: #f7f6f3;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ---- Teaser ------------------------------------------------------------ */
+
+.teaser { padding: 1rem 0 0; }
+.teaser figure { margin: 0; }
+.teaser img, .teaser video {
+  border-radius: 8px;
+  box-shadow: 0 4px 24px rgba(75, 51, 38, 0.10);
+}
+.teaser figcaption {
+  margin-top: 0.8rem;
+  font-size: 0.88rem;
+  color: var(--color-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ---- Content sections -------------------------------------------------- */
+
+.prose {
+  max-width: 48rem;
+  margin: 0 auto;
+  text-align: justify;
+  font-size: 1rem;
+}
+.prose p + p { margin-top: 1rem; }
+.prose strong { color: var(--color-heading); font-weight: 600; }
+.prose em { color: var(--color-text); }
+
+.figgrid {
+  display: grid;
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+.figgrid figure { margin: 0; }
+.figgrid img {
+  border-radius: 6px;
+  border: 1px solid rgba(75, 51, 38, 0.08);
+  background: #fff;
+}
+.figgrid figcaption {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ---- BibTeX block ------------------------------------------------------ */
+
+.bibtex {
+  background: var(--color-code-bg);
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--color-text);
+  overflow-x: auto;
+  border: 1px solid rgba(75, 51, 38, 0.08);
+}
+.bibtex pre { margin: 0; white-space: pre; }
+
+/* ---- Footer ------------------------------------------------------------ */
+
+.site-footer {
+  text-align: center;
+  padding: 2rem 0 3rem;
+  font-size: 0.85rem;
+  color: var(--color-muted);
+}
+
+/* ---- Responsive -------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .hero { padding: 2rem 0 1rem; }
+  .hero__title { font-size: 1.6rem; }
+  section.sect { padding: 2rem 0; }
+  .topbar__nav { gap: 0.85rem; font-size: 0.82rem; }
+  .topbar__inner { padding: 0.7rem 1rem; }
+}
