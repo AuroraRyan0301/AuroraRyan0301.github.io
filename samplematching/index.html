@@ -522,16 +522,38 @@ sitemap: false
 
       // Layout (in SVG units, 720 x 320)
       const camX = 110, camY = 175;
-      const boxC = { x: 380, y: 175 }, boxW = 100;
+      const boxC = { x: 380, y: 175 };
+      // Lens-shaped, super-Gaussian "ellipsoid" medium (wider than tall).
+      const lensRx = 95, lensRy = 34;
       const redLightX = 620, redLightY = 175;
       const blueLightX = 560, blueLightY = 60;
 
-      // --- Static (background) elements ---
-      // Box
-      const box = el('rect', {
-        x: boxC.x - boxW/2, y: boxC.y - boxW/2,
-        width: boxW, height: boxW,
-        rx: 4, stroke: '#cbd0d6', 'stroke-width': 1.5, fill: '#36393d', 'fill-opacity': 0.18
+      // Radial gradient mimicking a super-Gaussian density profile:
+      // ~flat plateau in the centre, sharp falloff toward the edge.
+      const defs = el('defs', {});
+      const grad = el('radialGradient', { id: 'mediumGrad', cx: '50%', cy: '50%', r: '50%' });
+      const STOPS = [
+        ['0%',   1.00],
+        ['50%',  0.97],
+        ['75%',  0.88],
+        ['86%',  0.62],
+        ['94%',  0.22],
+        ['100%', 0.00],
+      ];
+      for (const [off, op] of STOPS) {
+        grad.appendChild(el('stop', { offset: off, 'stop-color': '#1d2025', 'stop-opacity': String(op) }));
+      }
+      defs.appendChild(grad);
+      svg.appendChild(defs);
+
+      // Faint outline that survives even at low σ_t so the lens stays visible.
+      svg.appendChild(el('ellipse', {
+        cx: boxC.x, cy: boxC.y, rx: lensRx, ry: lensRy,
+        fill: 'none', stroke: 'rgba(120,128,138,0.35)', 'stroke-width': 1
+      }));
+      const box = el('ellipse', {
+        cx: boxC.x, cy: boxC.y, rx: lensRx, ry: lensRy,
+        fill: 'url(#mediumGrad)', 'fill-opacity': 0.18
       });
       svg.appendChild(box);
 
@@ -568,29 +590,28 @@ sitemap: false
 
       // Trunk (camera -> box left edge): the in-line radiance the camera sees
       const trunk = el('line', {
-        x1: camX + 12, y1: camY, x2: boxC.x - boxW/2, y2: boxC.y,
+        x1: camX + 12, y1: camY, x2: boxC.x - lensRx, y2: boxC.y,
         stroke: C_RED, 'stroke-width': 6, 'stroke-linecap': 'round'
       });
       svg.appendChild(trunk);
 
       // Red ray (box right edge -> red light): background transmission segment
       const redRay = el('line', {
-        x1: boxC.x + boxW/2, y1: boxC.y, x2: redLightX - 18, y2: redLightY,
+        x1: boxC.x + lensRx, y1: boxC.y, x2: redLightX - 18, y2: redLightY,
         stroke: C_RED, 'stroke-width': 6, 'stroke-linecap': 'round'
       });
       svg.appendChild(redRay);
 
-      // Blue ray (box top-right -> blue light): off-axis in-scattering
-      // Compute direction from box center to blue light
+      // Blue ray (box → blue light): off-axis in-scattering.
+      // Exit point on the ellipse surface in the blue direction.
       const blueDx = blueLightX - boxC.x;
       const blueDy = blueLightY - boxC.y;
       const blueLen = Math.hypot(blueDx, blueDy);
       const bux = blueDx / blueLen, buy = blueDy / blueLen;
-      // Ray exits box from a point on the right/top edge in the blue direction
-      // (simplified: from box center, offset to edge along normal)
-      const edgeOffset = boxW / 2 * 0.95;
-      const blueStartX = boxC.x + bux * edgeOffset;
-      const blueStartY = boxC.y + buy * edgeOffset;
+      // Surface t solves (t*bux/rx)² + (t*buy/ry)² = 1
+      const tEdge = 1 / Math.sqrt((bux/lensRx)**2 + (buy/lensRy)**2);
+      const blueStartX = boxC.x + bux * tEdge;
+      const blueStartY = boxC.y + buy * tEdge;
       const blueEndX = blueLightX - bux * 18;
       const blueEndY = blueLightY - buy * 18;
       const blueRay = el('line', {
