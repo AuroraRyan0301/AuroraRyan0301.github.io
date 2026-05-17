@@ -18,20 +18,22 @@ sitemap: false
   <style>
     /* Aspect-ratio reservation so first paint shows the full teaser / video. */
     .teaser__media {
-      aspect-ratio: 1955 / 313;
-      background: #f4efe9;
+      aspect-ratio: 4 / 3;
+      background: #111;
       border-radius: 8px;
       overflow: hidden;
+      max-width: 36rem;
+      margin: 0 auto;
     }
-    .teaser__media img { width: 100%; height: 100%; object-fit: contain; }
+    .teaser__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .teaser__video {
       aspect-ratio: 16 / 9;
-      background: #f4efe9;
+      background: #111;
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 4px 24px rgba(75, 51, 38, 0.10);
     }
-    .teaser__video video { width: 100%; height: 100%; display: block; }
+    .teaser__video video { width: 100%; height: 100%; display: block; object-fit: cover; }
 
     /* ---- Interactive toy ------------------------------------------------ */
     .toy {
@@ -141,9 +143,9 @@ sitemap: false
     <section class="teaser">
       <figure>
         <div class="teaser__media">
-          <img src="{{ '/samplematching/static/images/teaser.png' | relative_url }}"
-               width="1955" height="313"
-               alt="Teaser: DRT vs Reference vs Ours, with error heatmap">
+          <img src="{{ '/samplematching/static/images/teaser.jpg' | relative_url }}"
+               width="1920" height="1440"
+               alt="Teaser: Ours reconstruction vs error heatmap on a heterogeneous medium">
         </div>
         <figcaption>
           A single shared probe per segment (Ours) reduces gradient variance by up to 80% over DRT on the same compute budget.
@@ -238,8 +240,8 @@ sitemap: false
     <section id="video" class="sect sect--frag-inner">
       <h2 class="subhead">Video</h2>
       <div class="teaser__video">
-        <video controls playsinline preload="metadata"
-               poster="{{ '/samplematching/static/images/teaser.png' | relative_url }}">
+        <video controls playsinline preload="metadata" width="1920" height="1080"
+               poster="{{ '/samplematching/static/images/video_poster.jpg' | relative_url }}">
           <source src="{{ '/samplematching/static/videos/paper_video.mp4' | relative_url }}" type="video/mp4">
           Sorry, your browser doesn't support embedded video.
         </video>
