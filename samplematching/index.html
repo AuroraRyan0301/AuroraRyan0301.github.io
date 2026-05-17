@@ -684,7 +684,7 @@ sitemap: false
       var randomBtn = document.getElementById('randomSceneBtn');
       var startBtn  = document.getElementById('startBtn');
       var LIVE_N    = 256;
-      var LIVE_R    = 64;        // up to this many reps streamed
+      var LIVE_R    = 2560;      // hard cap (user can ■ stop earlier)
       var LIVE_SPP  = 32;
 
       function clamp01(v){ return v < 0 ? 0 : (v > 1 ? 1 : v); }

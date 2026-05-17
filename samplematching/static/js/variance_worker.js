@@ -200,6 +200,8 @@ self.addEventListener('message', (e) => {
   }
 
   let r = 0;
+  let lastPostMs = 0;
+  const POST_INTERVAL_MS = 80;      // throttle stream paints to ~12 Hz
   function step() {
     if (cancel) return;
     if (r >= R) {
@@ -230,15 +232,21 @@ self.addEventListener('message', (e) => {
     }
 
     r++;
-    // Post per-cell variance (m2 / max(n-1, 1)) for each mode
-    const out = { type: 'progress', r, R };
-    for (const mode of modes) {
-      const v = new Float32Array(N);
-      const denom = Math.max(r - 1, 1);
-      for (let i = 0; i < N; i++) v[i] = accs[mode].m2[i] / denom;
-      out['var_' + mode] = v;
+    // Post per-cell variance (m2 / max(n-1, 1)) for each mode.
+    // Throttle so 2560-rep runs don't drown the main thread in paints.
+    const now = Date.now();
+    const isLast = (r >= R);
+    if (isLast || (now - lastPostMs) >= POST_INTERVAL_MS || r === 1) {
+      lastPostMs = now;
+      const out = { type: 'progress', r, R };
+      for (const mode of modes) {
+        const v = new Float32Array(N);
+        const denom = Math.max(r - 1, 1);
+        for (let i = 0; i < N; i++) v[i] = accs[mode].m2[i] / denom;
+        out['var_' + mode] = v;
+      }
+      self.postMessage(out, modes.map(m => out['var_' + m].buffer));
     }
-    self.postMessage(out, modes.map(m => out['var_' + m].buffer));
     // Yield to event loop so cancellations can land
     setTimeout(step, 0);
   }
