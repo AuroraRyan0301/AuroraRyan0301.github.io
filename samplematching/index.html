@@ -17,6 +17,18 @@ sitemap: false
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <!-- KaTeX for inline math (\( ... \)) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+        integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+"
+        crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+          integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg"
+          crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+          integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk"
+          crossorigin="anonymous"
+          onload="renderMathInElement(document.body,{delimiters:[{left:'\\(',right:'\\)',display:false},{left:'$$',right:'$$',display:true}],throwOnError:false});"></script>
   <style>
     /* Aspect-ratio reservation so first paint shows the full teaser / video. */
     .teaser__media {
@@ -270,7 +282,7 @@ sitemap: false
           <strong style="color:#5286b5;">blue, off-axis</strong> radiance into
           the same outgoing ray. The density gradient is the
           <em>difference between the two radiances</em>. Drag
-          σ<sub>t</sub> below to watch the trade-off.
+          \(\sigma_t\) below to watch the trade-off.
         </p>
       </div>
 
@@ -279,7 +291,7 @@ sitemap: false
 
         <div class="toy__controls">
           <label class="row" style="flex:1;">
-            <span style="font-style:italic;font-family:var(--font-serif);font-size:1.05rem;">σ<sub>t</sub></span>
+            <span>\(\sigma_t\)</span>
             <input type="range" id="sigmaRng" min="0" max="1000" value="180" style="flex:1;">
             <span style="font-size:0.78rem;color:var(--color-muted);min-width:5.5rem;text-align:right;">
               <span id="sigmaLow">low</span> &nbsp;⟶&nbsp; <span id="sigmaHigh">high</span>
@@ -297,13 +309,13 @@ sitemap: false
           The four estimators agree on the transmittance probe (uniform on the
           host segment) and only differ in <em>where</em> the
           <strong style="color:#5286b5;">scattering</strong> term reads
-          ∂σ<sub>t</sub>. Each schematic shows two lines on the same axis:
-          the top one is the scattering probe with its sampling PDF drawn
-          as a blue silhouette; the bottom one is the
+          \(\partial\sigma_t\). Each schematic shows two lines on the same
+          axis: the top one is the scattering probe with its sampling PDF
+          drawn as a blue silhouette; the bottom one is the
           <strong style="color:#d96b6b;">transmittance</strong> probe.
           DRT's scattering PDF lives on the segment <em>extended</em> to the
-          medium boundary x(t<sub>s</sub>) (violet dashed). The strips below
-          show the resulting per-cell variance on a random N=128 scene at
+          medium boundary \(x(t_s)\) (violet dashed). The strips below show
+          the resulting per-cell variance on a random \(N=128\) scene at
           128 spp.
         </p>
       </div>
@@ -311,7 +323,7 @@ sitemap: false
       <div class="toy" id="toy">
         <div class="vbox">
           <div class="vbox__head">
-            <span class="vbox__title">Per-cell variance, N=128 grid, 128 spp</span>
+            <span class="vbox__title">Per-cell variance, \(N{=}128\) grid, 128 spp</span>
             <div class="vbox__cases" id="vboxCases" role="tablist">
               <button data-case="0" class="active">case 1</button>
               <button data-case="1">case 2</button>
@@ -350,7 +362,7 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>Free flight</strong>
-                <span>p<sub>scat</sub> ∝ σ<sub>t</sub>T &nbsp;(biased)</span>
+                <span>\(p_\text{scat} \propto \sigma_t\, T\)&nbsp;&nbsp;(biased)</span>
               </figcaption>
             </figure>
 
@@ -383,7 +395,7 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>DRT</strong>
-                <span>p<sub>scat</sub> ∝ T &nbsp;on&nbsp;[x<sub>j−1</sub>, x(t<sub>s</sub>)]</span>
+                <span>\(p_\text{scat} \propto T\) on \([x_{j-1},\,x(t_s)]\)</span>
               </figcaption>
             </figure>
 
@@ -410,7 +422,7 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>Unlock SM</strong>
-                <span>uniform · scat ⊥ trans</span>
+                <span>uniform &middot; \(s_1 \perp s_2\)</span>
               </figcaption>
             </figure>
 
@@ -440,7 +452,7 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>SM (locked)</strong>
-                <span>uniform · scat = trans</span>
+                <span>uniform &middot; \(s_1 = s_2\)</span>
               </figcaption>
             </figure>
           </div>
@@ -449,7 +461,7 @@ sitemap: false
             <span class="vbox__row-label">scene</span>
             <canvas id="curvesCanvas" width="720" height="74"></canvas>
             <div class="vbox__legend">
-              <span class="dot d"></span> density σₜ &nbsp;&nbsp;
+              <span class="dot d"></span> density \(\sigma_t\) &nbsp;&nbsp;
               <span class="dot a"></span> albedo
             </div>
           </div>
