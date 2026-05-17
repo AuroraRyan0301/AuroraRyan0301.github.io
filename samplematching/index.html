@@ -108,9 +108,14 @@ sitemap: false
       display: block; color: var(--color-heading); font-weight: 700;
     }
     .vbox__strategies figcaption span {
-      color: var(--color-muted); font-family: var(--font-mono);
-      font-size: 0.72rem;
+      color: var(--color-muted);
+      font-size: 0.78rem;
+      line-height: 1.35;
+      display: inline-block;
     }
+    /* KaTeX inline math inside the small figcaptions should sit at the
+       caption font size, not balloon up to the host paragraph size. */
+    .vbox__strategies figcaption .katex { font-size: 1em; }
     .vbox__head {
       display: flex; justify-content: space-between; align-items: baseline;
       flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.7rem;
@@ -314,9 +319,9 @@ sitemap: false
           drawn as a blue silhouette; the bottom one is the
           <strong style="color:#d96b6b;">transmittance</strong> probe.
           DRT's scattering PDF lives on the segment <em>extended</em> to the
-          medium boundary \(x(t_s)\) (violet dashed). The strips below show
-          the resulting per-cell variance on a random \(N=128\) scene at
-          128 spp.
+          medium boundary \(x_j^{\bot}\) (violet dashed). The strips below
+          show the resulting per-cell variance on a random \(N=128\) scene
+          at 128 spp.
         </p>
       </div>
 
@@ -362,7 +367,7 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>Free flight</strong>
-                <span>\(p_\text{scat} \propto \sigma_t\, T\)&nbsp;&nbsp;(biased)</span>
+                <span>\(p_{\mathrm{scat}}(y) \propto \sigma_t(y)\,T(y)\) &nbsp;(biased)</span>
               </figcaption>
             </figure>
 
@@ -389,13 +394,13 @@ sitemap: false
                 <text x="150" y="96" font-size="8" text-anchor="middle" fill="#777"
                       font-style="italic">x<tspan font-size="6" dy="2">j</tspan></text>
                 <text x="185" y="96" font-size="8" text-anchor="middle" fill="#a06bb8"
-                      font-style="italic">x(t<tspan font-size="6" dy="2">s</tspan>)</text>
+                      font-style="italic">x<tspan font-size="6" dy="2">j</tspan><tspan font-size="6" dy="-4">⊥</tspan></text>
                 <text x="3" y="50" font-size="7" fill="#2f4f70">scat</text>
                 <text x="3" y="80" font-size="7" fill="#7d3a3a">trans</text>
               </svg>
               <figcaption>
                 <strong>DRT</strong>
-                <span>\(p_\text{scat} \propto T\) on \([x_{j-1},\,x(t_s)]\)</span>
+                <span>\(p_{\mathrm{scat}}(y) \propto T(y)\) on \([x_{j-1},\,x_j^{\bot}]\)</span>
               </figcaption>
             </figure>
 
@@ -422,7 +427,7 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>Unlock SM</strong>
-                <span>uniform &middot; \(s_1 \perp s_2\)</span>
+                <span>\(p_{\mathrm{scat}}(y \mid x_j) = 1 / \|x_j - x_{j-1}\|\)</span>
               </figcaption>
             </figure>
 
@@ -452,7 +457,7 @@ sitemap: false
               </svg>
               <figcaption>
                 <strong>SM (locked)</strong>
-                <span>uniform &middot; \(s_1 = s_2\)</span>
+                <span>\(p_{\mathrm{scat}}(y \mid x_j) = 1 / \|x_j - x_{j-1}\|\)</span>
               </figcaption>
             </figure>
           </div>
