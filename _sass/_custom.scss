@@ -1,0 +1,60 @@
+// =============================================================
+// Custom overrides — suikasibyl-inspired clean academic look.
+// Loaded after the default theme imports in main.scss.
+// =============================================================
+
+// Body font: clean Helvetica stack with CJK fallback (handles Chinese names).
+body,
+.page__content {
+  font-family: "Helvetica Neue", Helvetica,
+               "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
+               "微软雅黑", Arial, sans-serif;
+  color: #2c3e50;
+}
+
+// Display font for headings + page titles.
+h1, h2, h3, h4, h5, h6,
+.page__title, .archive__item-title,
+.greedy-nav__title, .author__name {
+  font-family: "Google Sans", "Helvetica Neue", Helvetica,
+               "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  color: #2c3e50;
+}
+
+// Subtle, monochrome link color — closer to suikasibyl's grayscale palette.
+a {
+  color: #2c3e50;
+  text-decoration: underline;
+  text-decoration-color: rgba(44, 62, 80, 0.35);
+  text-underline-offset: 2px;
+}
+a:hover {
+  color: #209cee;
+  text-decoration-color: #209cee;
+}
+
+// Tighten masthead, give the page a bit more breathing room.
+.masthead { border-bottom: 1px solid #eaecef; }
+.masthead__inner-wrap { padding: 0.8em 1em; }
+
+// Author sidebar — slimmer typography.
+.author__avatar img { border-radius: 50%; }
+.author__name { font-weight: 600; }
+.author__bio { font-size: 0.92em; color: #555; }
+.author__urls a { color: #555; }
+.author__urls a:hover { color: #209cee; }
+
+// Page content: a touch wider line-height for readability.
+.page__content { line-height: 1.65; font-size: 1.0em; }
+
+// Publication card: tighter look, no excerpt clutter.
+.archive__item {
+  border-bottom: 1px solid #f0f2f5;
+  padding-bottom: 1.0em;
+  margin-bottom: 1.2em;
+}
+.archive__item-title { margin-bottom: 0.2em; font-size: 1.15em; }
+.archive__item-excerpt { font-size: 0.92em; color: #4a5568; }
+
+// Footer: simpler and lighter.
+.page__footer { background: #fafafa; border-top: 1px solid #eaecef; color: #777; }

@@ -1,0 +1,5 @@
+# Header navigation — minimal: only Publications. About lives on the front page.
+
+main:
+  - title: "Publications"
+    url: /publications/
