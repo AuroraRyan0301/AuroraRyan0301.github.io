@@ -156,22 +156,23 @@ sitemap: false
       background: var(--color-accent); color: #fff; border-color: var(--color-accent);
     }
     .vbox__curves, .vbox__strip {
-      display: grid; grid-template-columns: 7.5rem 1fr; align-items: center; gap: 0.75rem;
+      display: grid; grid-template-columns: 7.5rem 1fr 2.6rem; align-items: center; gap: 0.75rem;
       margin-bottom: 0.5rem;
     }
+    .vbox__curves canvas, .vbox__strip canvas { grid-column: 2 / 3; }
     .vbox__row-label {
       font-size: 0.78rem; color: var(--color-muted); text-align: right;
       font-family: var(--font-mono); letter-spacing: 0.02em;
     }
-    /* Scene-row left cell: 'scene' label always visible, and (only when
-       Case N is active) a 🎲 / ▶ icon button pair to its LEFT — laid out
-       horizontally so the row height never grows. */
+    /* Curves-row right cell: stacked 🎲 / ▶ buttons (visible only when
+       Case N is active). Vertical stack saves horizontal space so the
+       curves canvas isn't pushed off-centre. */
     .vbox__row-controls {
-      display: flex; flex-direction: row; align-items: center;
-      justify-content: flex-end; gap: 0.35rem;
+      grid-column: 3 / 4;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 0.3rem;
       height: 100%;
     }
-    .vbox__row-controls .vbox__row-label { order: 3; }
     .vbox__row-controls button { display: none; }
     .vbox__row-controls.live button { display: inline-flex;
       align-items: center; justify-content: center;
@@ -518,12 +519,12 @@ sitemap: false
           </div>
 
           <div class="vbox__curves">
+            <span class="vbox__row-label">scene</span>
+            <canvas id="curvesCanvas" width="720" height="74"></canvas>
             <div class="vbox__row-controls">
               <button id="randomSceneBtn" type="button" title="Generate a fresh random density / albedo">🎲</button>
               <button id="startBtn"       type="button" title="Start / stop streaming variance estimates" aria-label="Start"><svg class="ctrl-icon ctrl-icon--play"  viewBox="0 0 10 10" aria-hidden="true"><polygon points="3,2 3,8 8,5"/></svg><svg class="ctrl-icon ctrl-icon--stop" viewBox="0 0 10 10" aria-hidden="true"><rect x="3" y="3" width="4" height="4"/></svg></button>
-              <span class="vbox__row-label">scene</span>
             </div>
-            <canvas id="curvesCanvas" width="720" height="74"></canvas>
             <div class="vbox__legend">
               <span class="dot d"></span> density \(\sigma_t\) &nbsp;&nbsp;
               <span class="dot a"></span> albedo
