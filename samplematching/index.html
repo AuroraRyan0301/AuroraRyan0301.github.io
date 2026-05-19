@@ -156,7 +156,7 @@ sitemap: false
       background: var(--color-accent); color: #fff; border-color: var(--color-accent);
     }
     .vbox__curves, .vbox__strip {
-      display: grid; grid-template-columns: 3rem 1fr 2.6rem; align-items: center; gap: 0.6rem;
+      display: grid; grid-template-columns: 2.5rem 1fr 2.6rem; align-items: center; gap: 0.6rem;
       margin-bottom: 0.5rem;
     }
     .vbox__curves canvas, .vbox__strip canvas { grid-column: 2 / 3; }
@@ -222,7 +222,7 @@ sitemap: false
     .vbox__legend .dot.a { background: #7fb878; }
     .vbox__cbar {
       margin-top: 0.5rem;
-      padding-left: 3.6rem;     /* col-1 (3rem) + grid gap (0.6rem) */
+      padding-left: 3.1rem;     /* col-1 (2.5rem) + grid gap (0.6rem) */
       padding-right: 3.2rem;    /* col-3 (2.6rem) + grid gap (0.6rem) */
     }
     .vbox__cbar canvas {
@@ -234,8 +234,8 @@ sitemap: false
       font-family: var(--font-mono);
     }
     @media (max-width: 560px) {
-      .vbox__curves, .vbox__strip { grid-template-columns: 2.6rem 1fr 2.2rem; gap: 0.35rem; }
-      .vbox__cbar { padding-left: 2.95rem; padding-right: 2.55rem; }
+      .vbox__curves, .vbox__strip { grid-template-columns: 2.2rem 1fr 2.2rem; gap: 0.35rem; }
+      .vbox__cbar { padding-left: 2.55rem; padding-right: 2.55rem; }
     }
     @media (max-width: 560px) {
       .toy__readout { grid-template-columns: 1fr; }
