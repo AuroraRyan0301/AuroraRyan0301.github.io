@@ -179,17 +179,19 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
   width: 100%;
   max-width: 21rem;
   margin: 0.8rem auto 0;  /* gap above + centered horizontally */
-  font-size: 0.78rem;
-  line-height: 1.45;
-  font-style: italic;
-  color: #b08868;         /* light brown */
+  font-family: 'Caveat', cursive;
+  font-size: 1.2rem;       /* handwritten fonts read smaller; bump up */
+  line-height: 1.25;
+  font-weight: 500;
+  color: #b08868;          /* light brown */
   text-align: left;
 }
 .hero__quote-attr {
   display: block;
-  margin-top: 0.25rem;
-  font-style: normal;
-  font-size: 0.72rem;
+  margin-top: 0.35rem;
+  font-family: 'Caveat', cursive;
+  font-weight: 400;
+  font-size: 1.05rem;
   color: #a58465;
 }
 
