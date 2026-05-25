@@ -178,22 +178,40 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
   display: block;
   width: 100%;
   max-width: 21rem;
-  margin: 0.8rem auto 0;  /* gap above + centered horizontally */
-  font-family: 'Caveat', cursive;
-  font-size: 1.2rem;       /* handwritten fonts read smaller; bump up */
-  line-height: 1.25;
-  font-weight: 500;
+  margin: 0.8rem auto 0;
+  line-height: 1.3;
   color: #b08868;          /* light brown */
   text-align: left;
 }
 .hero__quote-attr {
   display: block;
   margin-top: 0.35rem;
-  font-family: 'Caveat', cursive;
-  font-weight: 400;
-  font-size: 1.05rem;
   color: #a58465;
 }
+.hero__quote-tag {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #b08868a8;
+}
+/* --- Variant 1: Caveat (casual handwriting) --- */
+.hero__quote--caveat              { font-family: 'Caveat', cursive; font-size: 1.2rem; font-weight: 500; }
+.hero__quote--caveat .hero__quote-attr   { font-family: 'Caveat', cursive; font-size: 1.05rem; font-weight: 400; }
+/* --- Variant 2: Dancing Script (flowing cursive) --- */
+.hero__quote--dancing             { font-family: 'Dancing Script', cursive; font-size: 1.05rem; font-weight: 500; }
+.hero__quote--dancing .hero__quote-attr  { font-family: 'Dancing Script', cursive; font-size: 0.92rem; font-weight: 500; }
+/* --- Variant 3: Cormorant Garamond Italic (literary serif italic) --- */
+.hero__quote--cormorant           { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.1rem; font-weight: 500; }
+.hero__quote--cormorant .hero__quote-attr{ font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 0.95rem; }
+/* --- Variant 4: Parisienne (elegant wedding-card script) --- */
+.hero__quote--parisienne          { font-family: 'Parisienne', cursive; font-size: 1.05rem; }
+.hero__quote--parisienne .hero__quote-attr{ font-family: 'Parisienne', cursive; font-size: 0.9rem; }
+/* --- Variant 5: Italianno (very thin formal calligraphy) --- */
+.hero__quote--italianno           { font-family: 'Italianno', cursive; font-size: 1.55rem; line-height: 1.15; }
+.hero__quote--italianno .hero__quote-attr{ font-family: 'Italianno', cursive; font-size: 1.25rem; }
 
 /* ---- Publication cards (suikasibyl-style spacing) ---------------------- */
 

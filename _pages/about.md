@@ -53,7 +53,28 @@ redirect_from:
     </div>
     <div class="hero__photo">
       <img src="{{ '/images/profile.jpg' | relative_url }}" alt="Ruihan Yu">
-      <p class="hero__quote">
+      <p class="hero__quote hero__quote--caveat">
+        <span class="hero__quote-tag">Caveat</span>
+        &ldquo;I think a physicist&rsquo;s biggest failure is when the students in their lab no longer want to become an AP.&rdquo;
+        <span class="hero__quote-attr">&mdash; an abused and traumatized former physics PhD</span>
+      </p>
+      <p class="hero__quote hero__quote--dancing">
+        <span class="hero__quote-tag">Dancing Script</span>
+        &ldquo;I think a physicist&rsquo;s biggest failure is when the students in their lab no longer want to become an AP.&rdquo;
+        <span class="hero__quote-attr">&mdash; an abused and traumatized former physics PhD</span>
+      </p>
+      <p class="hero__quote hero__quote--cormorant">
+        <span class="hero__quote-tag">Cormorant Garamond Italic</span>
+        &ldquo;I think a physicist&rsquo;s biggest failure is when the students in their lab no longer want to become an AP.&rdquo;
+        <span class="hero__quote-attr">&mdash; an abused and traumatized former physics PhD</span>
+      </p>
+      <p class="hero__quote hero__quote--parisienne">
+        <span class="hero__quote-tag">Parisienne</span>
+        &ldquo;I think a physicist&rsquo;s biggest failure is when the students in their lab no longer want to become an AP.&rdquo;
+        <span class="hero__quote-attr">&mdash; an abused and traumatized former physics PhD</span>
+      </p>
+      <p class="hero__quote hero__quote--italianno">
+        <span class="hero__quote-tag">Italianno</span>
         &ldquo;I think a physicist&rsquo;s biggest failure is when the students in their lab no longer want to become an AP.&rdquo;
         <span class="hero__quote-attr">&mdash; an abused and traumatized former physics PhD</span>
       </p>
