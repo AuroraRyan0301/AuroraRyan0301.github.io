@@ -177,14 +177,15 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 .hero__quote {
   display: block;
   width: 100%;
-  max-width: 21rem;
+  max-width: 18rem;        /* narrower than the 21rem photo so the
+                              block sits visually centered under it */
   margin: 0.8rem auto 0;
   font-family: 'Caveat', cursive;
   font-size: 1.2rem;
   line-height: 1.25;
   font-weight: 500;
   color: #b08868;          /* light brown */
-  text-align: center;
+  text-align: left;        /* prose reads left-aligned */
 }
 .hero__quote-attr {
   display: block;
@@ -193,6 +194,7 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
   font-weight: 400;
   font-size: 1.05rem;
   color: #a58465;
+  text-align: right;       /* attribution flushed to the right edge */
 }
 
 /* ---- Publication cards (suikasibyl-style spacing) ---------------------- */
