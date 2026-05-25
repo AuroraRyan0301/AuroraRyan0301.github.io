@@ -53,6 +53,10 @@ redirect_from:
     </div>
     <div class="hero__photo">
       <img src="{{ '/images/profile.jpg' | relative_url }}" alt="Ruihan Yu">
+      <p class="hero__quote">
+        &ldquo;I think a physicist&rsquo;s biggest failure is when the students in their lab no longer want to become an AP.&rdquo;
+        <span class="hero__quote-attr">&mdash; an abused and traumatized former physics PhD</span>
+      </p>
     </div>
   </div>
 </section>

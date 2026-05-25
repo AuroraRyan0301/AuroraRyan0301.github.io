@@ -161,7 +161,9 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 .hero__photo {
   width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
 }
 
 .hero__photo img {
@@ -170,6 +172,24 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
   height: auto;
   border-radius: 0.5rem;
   box-shadow: 0 8px 28px rgba(75, 51, 38, 0.12);
+}
+
+.hero__quote {
+  width: 100%;
+  max-width: 21rem;
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  font-style: italic;
+  color: #b08868;       /* light brown */
+  text-align: left;
+}
+.hero__quote-attr {
+  display: block;
+  margin-top: 0.25rem;
+  font-style: normal;
+  font-size: 0.72rem;
+  color: #a58465;
 }
 
 /* ---- Publication cards (suikasibyl-style spacing) ---------------------- */
