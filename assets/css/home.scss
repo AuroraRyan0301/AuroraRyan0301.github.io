@@ -160,10 +160,8 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 
 .hero__photo {
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.7rem;
+  display: block;
+  text-align: center;     /* centers the inline-block img inside the column */
 }
 
 .hero__photo img {
@@ -172,16 +170,19 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
   height: auto;
   border-radius: 0.5rem;
   box-shadow: 0 8px 28px rgba(75, 51, 38, 0.12);
+  display: block;
+  margin: 0 auto;
 }
 
 .hero__quote {
+  display: block;
   width: 100%;
   max-width: 21rem;
-  margin: 0;
+  margin: 0.8rem auto 0;  /* gap above + centered horizontally */
   font-size: 0.78rem;
   line-height: 1.45;
   font-style: italic;
-  color: #b08868;       /* light brown */
+  color: #b08868;         /* light brown */
   text-align: left;
 }
 .hero__quote-attr {
