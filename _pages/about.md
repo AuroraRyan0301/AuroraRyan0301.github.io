@@ -132,7 +132,8 @@ redirect_from:
           <a href="{{ '/2dgh/' | relative_url }}">project page</a>
           <a href="https://ieeexplore.ieee.org/document/11204833/">IEEE</a>
           <a href="https://arxiv.org/abs/2408.16982">arXiv</a>
-          <a href="#">code (soon)</a>
+          <a href="https://github.com/AuroraRyan0301/2DGH">code</a>
+          <a href="https://huggingface.co/datasets/AuroraRyan2/Detail">dataset</a>
         </p>
       </div>
     </article>
