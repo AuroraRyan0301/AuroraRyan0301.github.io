@@ -112,36 +112,6 @@
   }
   var MOTE = moteSprite();
 
-  /* ---- shared sprite pool ------------------------------------------------ */
-
-  /* A fixed pool of baked variants shared by all leaves — colors, shapes
-     and sizes are random-jittered anyway, so ~28 variants read as endless
-     variety while memory and startup rasterization stay constant no
-     matter how long the page is. Depth (and its baked depth-of-field
-     blur) is stratified across the pool so every z band is represented. */
-  var POOL = [];
-  function buildPool() {
-    var N = 28;
-    for (var i = 0; i < N; i++) {
-      var z = (0.7 + 1.5 * (i / (N - 1))) * (0.97 + rnd() * 0.06);
-
-      /* soft muted autumn reds; a third of the leaves lean deeper crimson */
-      var deep = rnd() < 0.33;
-      var hue = deep ? 2 + rnd() * 10 : 10 + rnd() * 22;
-      var sat = 40 + rnd() * 18;
-      var lit = deep ? 48 + rnd() * 9 : 54 + rnd() * 13;
-
-      var size = 10 + rnd() * 9;
-      var type = rnd() < 0.45 ? 0 : (rnd() < 0.65 ? 1 : 2);
-
-      /* bake depth-of-field blur (mid plane ~1.0 is sharp) */
-      var blur = z < 0.85 ? 0.6 : (z > 1.3 ? (z - 1.3) * 1.8 + 0.8 : 0);
-      var sp = makeSprite(size, type, Math.round(hue), Math.round(sat),
-                          Math.round(lit), blur);
-      POOL.push({ img: sp.img, S: sp.S, z: z });
-    }
-  }
-
   /* ---- particles --------------------------------------------------------- */
 
   /* Spawn mostly in the blank side margins, only occasionally over the
@@ -154,14 +124,26 @@
   }
 
   function newLeaf(initial) {
-    var v = POOL[(rnd() * POOL.length) | 0];
-    /* depth stays inside the variant's z band so the baked blur matches */
-    var z = v.z * (0.95 + rnd() * 0.1);
-    var approaching = z > 1.6 && rnd() < 0.45;
+    var approaching = rnd() < 0.18;
+    var z = approaching ? 1.7 + rnd() * 0.5 : 0.7 + rnd() * 1.1;
+
+    /* soft muted autumn reds; a third of the leaves lean deeper crimson */
+    var deep = rnd() < 0.33;
+    var hue = deep ? 2 + rnd() * 10 : 10 + rnd() * 22;
+    var sat = 40 + rnd() * 18;
+    var lit = deep ? 48 + rnd() * 9 : 54 + rnd() * 13;
+
+    var size = 10 + rnd() * 9;
+    var type = rnd() < 0.45 ? 0 : (rnd() < 0.65 ? 1 : 2);
+
+    /* bake depth-of-field blur into the sprite (mid plane ~1.0 is sharp) */
+    var blur = z < 0.85 ? 0.6 : (z > 1.3 ? (z - 1.3) * 1.8 + 0.8 : 0);
+    var sp = makeSprite(size, type, Math.round(hue), Math.round(sat),
+                        Math.round(lit), blur);
 
     var fromSide = !initial && rnd() < 0.25;
     return {
-      sprite: v,
+      sprite: sp,
       x: fromSide ? -40 : spawnX(),
       y: initial ? rnd() * worldH : (fromSide ? rnd() * worldH : -40),
       z: z,
@@ -177,6 +159,13 @@
       alpha: 0.55 + rnd() * 0.3,
       ramp: initial ? 1 : 0
     };
+  }
+
+  function respawn(f) {
+    var nf = newLeaf(false);
+    nf.sprite = f.sprite;                       /* reuse the baked sprite */
+    nf.z = f.dz ? nf.z : f.z;                   /* keep depth ≈ blur match */
+    return nf;
   }
 
   function newMote() {
@@ -289,7 +278,7 @@
       }
 
       if (f.y > worldH + 50 || f.x < -70 || f.x > W + 70) {
-        leaves[i] = newLeaf(false);             /* pool sprite: no rebake */
+        leaves[i] = respawn(f);
         continue;
       }
 
@@ -380,14 +369,7 @@
     fitCanvas();
   }
 
-  /* debounced: dragging a window edge fires resize dozens of times per
-     second, and each un-debounced call would reallocate the whole
-     document-sized canvas */
-  var resizeTimer;
-  window.addEventListener('resize', function () {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(resize, 150);
-  });
+  window.addEventListener('resize', resize);
   if ('ResizeObserver' in window) {
     /* catch document-height changes (images loading, fonts, etc.) */
     new ResizeObserver(function () {
@@ -400,7 +382,6 @@
     last = performance.now();                   /* avoid a dt jump on return */
   });
 
-  buildPool();
   resize();
   requestAnimationFrame(frame);
 })();
