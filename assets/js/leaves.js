@@ -3,12 +3,13 @@
  * Design notes:
  * - Everything lives on one fixed, pointer-events:none canvas behind the
  *   content (z-index:-1), so text/cards are never obscured.
- * - Leaves live in DOCUMENT space, not screen space: they are spread over
- *   the full page height and fall from the top of the page to its bottom
- *   (a longer page means a longer fall). The fixed canvas just acts as a
- *   camera — each frame subtracts window.scrollY and culls what's not in
- *   view, so scrolling moves through the leaf field instead of dragging
- *   it along.
+ * - Leaves live in DOCUMENT space: the canvas is position:absolute and
+ *   spans the whole page, so it scrolls with the content on the
+ *   compositor thread — perfectly in sync, no scroll jank. Leaves are
+ *   spread over the full page height and fall from page top to page
+ *   bottom (a longer page means a longer fall). Each frame only the
+ *   region near the viewport is cleared and redrawn, and the backing
+ *   resolution adapts so very long pages don't blow up canvas memory.
  * - Leaves are pre-rendered to small offscreen sprites (3 shapes, soft
  *   autumn hues jittered in HSL to sit well on the warm-white page).
  * - Depth of field: each leaf gets a depth z; far leaves are smaller,
@@ -189,11 +190,11 @@
   function drawLight(t, sy) {
     /* Sunlight is anchored near the top of the DOCUMENT (with a gentle
        0.3 parallax, as befits a distant light source), so scrolling down
-       the page naturally leaves the lit canopy behind. */
-    var off = sy * 0.3;
-    if (off > H * 2.6) return;                  /* fully scrolled past it */
+       the page naturally leaves the lit canopy behind. In document
+       coordinates a 0.3 parallax means the light sits at 0.7 * scrollY. */
+    if (sy * 0.3 > H * 2.6) return;             /* fully scrolled past it */
     ctx.save();
-    ctx.translate(0, -off);
+    ctx.translate(0, sy * 0.7);
 
     /* warm glow bleeding in from the upper left */
     var breathe = 0.05 + 0.02 * Math.sin(t * 0.06);
@@ -226,8 +227,11 @@
   /* ---- main loop ---------------------------------------------------------- */
 
   function step(t, dt) {
-    var sy = window.scrollY || 0;               /* camera position */
-    ctx.clearRect(0, 0, W, H);
+    var sy = window.scrollY || 0;
+    /* only touch the pixels near the viewport (plus a fast-scroll margin) */
+    var top = Math.max(0, sy - H * 1.2);
+    var bot = Math.min(worldH, sy + H * 2.2);
+    ctx.clearRect(0, top, W, bot - top);
     drawLight(t, sy);
 
     leaves.sort(function (a, b) { return b.z - a.z; });   /* far first */
@@ -259,13 +263,15 @@
         continue;
       }
 
-      var vy = f.y - sy;                        /* world -> screen */
-      if (vy < -120 || vy > H + 120) continue;  /* off-camera: skip draw */
+      /* draw only sprites fully inside the cleared band, so nothing
+         leaves stale pixels behind (band edges sit ~1 screen off-view) */
+      if ((top > 0 && f.y < top + 130) ||
+          (bot < worldH && f.y > bot - 130)) continue;
 
       var depthA = Math.min(0.9, Math.max(0.35, 1.25 - 0.4 * f.z));
       ctx.globalAlpha = f.alpha * depthA * f.ramp * bandFade;
       ctx.save();
-      ctx.translate(f.x, vy);
+      ctx.translate(f.x, f.y);
       ctx.rotate(f.angle);
       /* tumble: squash on one axis to fake a 3D turn */
       ctx.scale(scale * (0.3 + 0.7 * Math.abs(Math.cos(f.flip))), scale);
@@ -280,10 +286,10 @@
       m.y += m.vy * dt;
       m.x += Math.sin(t * 0.3 + m.swayP) * 4 * dt;
       if (m.y < -m.r * 2) { motes[j] = newMote(); motes[j].y = worldH + m.r; continue; }
-      var my = m.y - sy;
-      if (my < -90 || my > H + 90) continue;
+      if ((top > 0 && m.y < top + m.r + 10) ||
+          (bot < worldH && m.y > bot - m.r - 10)) continue;
       ctx.globalAlpha = m.a * (0.6 + 0.4 * Math.sin(t * m.tw + m.swayP));
-      ctx.drawImage(MOTE, m.x - m.r, my - m.r, m.r * 2, m.r * 2);
+      ctx.drawImage(MOTE, m.x - m.r, m.y - m.r, m.r * 2, m.r * 2);
     }
     ctx.globalAlpha = 1;
   }
@@ -323,20 +329,32 @@
     if (motes.length > wantM) motes.length = wantM;
   }
 
+  function fitCanvas() {
+    DPR = Math.min(window.devicePixelRatio || 1, 2);
+    /* the backing store covers the whole document — scale resolution
+       down on very long pages to keep canvas memory bounded (~96 MB) */
+    while (W * worldH * DPR * DPR > 24e6 && DPR > 0.8) DPR *= 0.85;
+    canvas.width = Math.ceil(W * DPR);
+    canvas.height = Math.ceil(worldH * DPR);
+    canvas.style.height = worldH + 'px';
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  }
+
   function resize() {
     W = window.innerWidth;
     H = window.innerHeight;
-    DPR = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.ceil(W * DPR);
-    canvas.height = Math.ceil(H * DPR);
-    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     measure();
+    fitCanvas();
   }
 
   window.addEventListener('resize', resize);
   if ('ResizeObserver' in window) {
     /* catch document-height changes (images loading, fonts, etc.) */
-    new ResizeObserver(measure).observe(document.body);
+    new ResizeObserver(function () {
+      var old = worldH;
+      measure();
+      if (worldH !== old) fitCanvas();
+    }).observe(document.body);
   }
   document.addEventListener('visibilitychange', function () {
     last = performance.now();                   /* avoid a dt jump on return */

@@ -108,10 +108,12 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 /* ---- Falling-leaves ambient background (assets/js/leaves.js) ------------ */
 
 #leaves-canvas {
-  position: fixed;
-  inset: 0;
+  position: absolute;      /* spans the whole document; scrolls with the
+                              content on the compositor thread, so leaves
+                              never lag behind the page (height set by JS) */
+  top: 0;
+  left: 0;
   width: 100%;
-  height: 100%;
   pointer-events: none;
   z-index: -1;            /* above the body background, below all content */
 }
