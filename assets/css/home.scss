@@ -105,6 +105,17 @@ p { margin: 0 0 0.85rem 0; }
 
 html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 
+/* ---- Falling-leaves ambient background (assets/js/leaves.js) ------------ */
+
+#leaves-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: -1;            /* above the body background, below all content */
+}
+
 /* ---- Section scaffolding (mirrors rshi.top sect-lane / sect-box) -------- */
 
 .sect-lane { width: 100%; padding: 3rem 0; }
