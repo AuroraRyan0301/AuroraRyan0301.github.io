@@ -121,6 +121,39 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
   letter-spacing: 0.01em;
 }
 
+/* ---- News list --------------------------------------------------------- */
+
+.news-list {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 46rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.news {
+  display: grid;
+  grid-template-columns: 4.5rem 1.75rem 1fr;
+  align-items: baseline;
+  gap: 0.6rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.news__date {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--color-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.news__emoji { font-size: 1.05em; line-height: 1.4; text-align: center; }
+
+.news__text strong { font-weight: 600; color: var(--color-heading); }
+
 /* ---- Hero: About text on the left, photo on the right ------------------ */
 
 .hero {
@@ -371,4 +404,5 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
   .pub { grid-template-columns: 1fr; gap: 0.9rem; padding: 1rem; }
   .pub__thumb { max-width: 18rem; margin: 0 auto; }
   .hero__name { font-size: 2rem; }
+  .news { grid-template-columns: 3.5rem 1.5rem 1fr; gap: 0.45rem; font-size: 0.95rem; }
 }

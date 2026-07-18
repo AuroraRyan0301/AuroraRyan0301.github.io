@@ -61,6 +61,28 @@ redirect_from:
   </div>
 </section>
 
+<section id="news" class="sect-lane">
+  <h2 class="subhead">News</h2>
+  <ul class="news-list">
+    <li class="news">
+      <span class="news__date">2026.05</span>
+      <span class="news__emoji" aria-hidden="true">&#x1F4E3;&#x1F389;</span>
+      <span class="news__text">
+        Our paper
+        <a href="{{ '/samplematching/' | relative_url }}">Sample Matching</a>
+        received a <strong>SIGGRAPH 2026 Best Paper Honorable Mention</strong>!
+      </span>
+    </li>
+    <li class="news">
+      <span class="news__date">2025.10</span>
+      <span class="news__emoji" aria-hidden="true">&#x1F52C;</span>
+      <span class="news__text">
+        I started my internship at <strong>Shanda Alaya Lab</strong>.
+      </span>
+    </li>
+  </ul>
+</section>
+
 <section id="publications" class="sect-lane sect-lane--frag">
   <h2 class="subhead">Selected Publications</h2>
   <div class="pub-list">
