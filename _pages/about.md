@@ -77,7 +77,8 @@ redirect_from:
       <span class="news__date">2025.10</span>
       <span class="news__emoji" aria-hidden="true">&#x1F52C;</span>
       <span class="news__text">
-        I started my internship at <strong>Shanda Alaya Lab</strong>.
+        I started my internship at
+        <a href="https://alaya-lab.github.io/AlayaLab/"><strong>Shanda Alaya Lab</strong></a>.
       </span>
     </li>
   </ul>
