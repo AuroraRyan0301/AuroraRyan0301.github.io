@@ -32,7 +32,7 @@
   document.body.appendChild(canvas);
   var ctx = canvas.getContext('2d');
 
-  var DPR = Math.min(window.devicePixelRatio || 1, 2);
+  var DPR = Math.min(window.devicePixelRatio || 1, 1.5);
   var W = 0, H = 0;          /* viewport (camera) size */
   var worldH = 0;            /* full document height — the leaves' world */
   var contentL = 0, contentR = 0, hasMargins = false;
@@ -187,6 +187,25 @@
              +  3 * Math.sin(t * 0.47);
   }
 
+  /* Light gradients are built once per resize and drawn with globalAlpha,
+     instead of allocating new gradient objects every frame. */
+  var glowGrad = null, beams = [];
+  function buildLight() {
+    glowGrad = ctx.createRadialGradient(W * 0.12, -H * 0.05, 0,
+                                        W * 0.12, -H * 0.05, Math.max(W, H) * 0.75);
+    glowGrad.addColorStop(0, 'rgba(255,215,150,1)');
+    glowGrad.addColorStop(1, 'rgba(255,215,150,0)');
+    beams = [];
+    for (var i = 0; i < 3; i++) {
+      var w = 70 + i * 45;
+      var lg = ctx.createLinearGradient(-w / 2, 0, w / 2, 0);
+      lg.addColorStop(0,   'rgba(255,225,170,0)');
+      lg.addColorStop(0.5, 'rgba(255,225,170,1)');
+      lg.addColorStop(1,   'rgba(255,225,170,0)');
+      beams.push({ w: w, grad: lg });
+    }
+  }
+
   function drawLight(t, sy) {
     /* Sunlight is anchored near the top of the DOCUMENT (with a gentle
        0.3 parallax, as befits a distant light source), so scrolling down
@@ -197,12 +216,8 @@
     ctx.translate(0, sy * 0.7);
 
     /* warm glow bleeding in from the upper left */
-    var breathe = 0.05 + 0.02 * Math.sin(t * 0.06);
-    var g = ctx.createRadialGradient(W * 0.12, -H * 0.05, 0,
-                                     W * 0.12, -H * 0.05, Math.max(W, H) * 0.75);
-    g.addColorStop(0, 'rgba(255,215,150,' + (breathe + 0.05).toFixed(3) + ')');
-    g.addColorStop(1, 'rgba(255,215,150,0)');
-    ctx.fillStyle = g;
+    ctx.globalAlpha = 0.1 + 0.02 * Math.sin(t * 0.06);
+    ctx.fillStyle = glowGrad;
     ctx.fillRect(0, 0, W, Math.max(W, H) * 0.8);
 
     /* three faint sun beams slanting through */
@@ -212,26 +227,30 @@
       ctx.save();
       ctx.translate(W * (0.06 + i * 0.17), -80);
       ctx.rotate(0.48 - i * 0.05 + 0.015 * Math.sin(t * 0.07 + i));
-      var w = 70 + i * 45;
-      var lg = ctx.createLinearGradient(-w / 2, 0, w / 2, 0);
-      lg.addColorStop(0,   'rgba(255,225,170,0)');
-      lg.addColorStop(0.5, 'rgba(255,225,170,' + a.toFixed(3) + ')');
-      lg.addColorStop(1,   'rgba(255,225,170,0)');
-      ctx.fillStyle = lg;
-      ctx.fillRect(-w / 2, 0, w, H * 2.3);
+      ctx.globalAlpha = a;
+      ctx.fillStyle = beams[i].grad;
+      ctx.fillRect(-beams[i].w / 2, 0, beams[i].w, H * 2.3);
       ctx.restore();
     }
     ctx.restore();
+    ctx.globalAlpha = 1;
   }
 
   /* ---- main loop ---------------------------------------------------------- */
 
   function step(t, dt) {
     var sy = window.scrollY || 0;
-    /* only touch the pixels near the viewport (plus a fast-scroll margin) */
-    var top = Math.max(0, sy - H * 1.2);
-    var bot = Math.min(worldH, sy + H * 2.2);
+    /* Only touch the pixels near the viewport. The band is re-centered on
+       the live scroll position every frame, so what's on screen is always
+       freshly drawn — the margin only exists so sprites straddling the
+       viewport edge are never culled mid-body. */
+    var top = Math.max(0, sy - 260);
+    var bot = Math.min(worldH, sy + H + 260);
     ctx.clearRect(0, top, W, bot - top);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, top, W, bot - top);
+    ctx.clip();                                 /* nothing paints outside */
     drawLight(t, sy);
 
     leaves.sort(function (a, b) { return b.z - a.z; });   /* far first */
@@ -291,6 +310,7 @@
       ctx.globalAlpha = m.a * (0.6 + 0.4 * Math.sin(t * m.tw + m.swayP));
       ctx.drawImage(MOTE, m.x - m.r, m.y - m.r, m.r * 2, m.r * 2);
     }
+    ctx.restore();                              /* drop the band clip */
     ctx.globalAlpha = 1;
   }
 
@@ -330,14 +350,16 @@
   }
 
   function fitCanvas() {
-    DPR = Math.min(window.devicePixelRatio || 1, 2);
-    /* the backing store covers the whole document — scale resolution
-       down on very long pages to keep canvas memory bounded (~96 MB) */
-    while (W * worldH * DPR * DPR > 24e6 && DPR > 0.8) DPR *= 0.85;
+    /* Cap at 1.5x: the leaves are soft-focus anyway, and every extra
+       pixel here is per-frame clear + texture-upload work while
+       scrolling. Step further down on very long pages to bound memory. */
+    DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+    while (W * worldH * DPR * DPR > 14e6 && DPR > 0.8) DPR *= 0.85;
     canvas.width = Math.ceil(W * DPR);
     canvas.height = Math.ceil(worldH * DPR);
     canvas.style.height = worldH + 'px';
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    buildLight();
   }
 
   function resize() {
