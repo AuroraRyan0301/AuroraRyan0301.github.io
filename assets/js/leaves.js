@@ -3,6 +3,12 @@
  * Design notes:
  * - Everything lives on one fixed, pointer-events:none canvas behind the
  *   content (z-index:-1), so text/cards are never obscured.
+ * - Leaves live in DOCUMENT space, not screen space: they are spread over
+ *   the full page height and fall from the top of the page to its bottom
+ *   (a longer page means a longer fall). The fixed canvas just acts as a
+ *   camera — each frame subtracts window.scrollY and culls what's not in
+ *   view, so scrolling moves through the leaf field instead of dragging
+ *   it along.
  * - Leaves are pre-rendered to small offscreen sprites (3 shapes, soft
  *   autumn hues jittered in HSL to sit well on the warm-white page).
  * - Depth of field: each leaf gets a depth z; far leaves are smaller,
@@ -26,7 +32,8 @@
   var ctx = canvas.getContext('2d');
 
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
-  var W = 0, H = 0;
+  var W = 0, H = 0;          /* viewport (camera) size */
+  var worldH = 0;            /* full document height — the leaves' world */
   var leaves = [], motes = [];
   var rnd = Math.random;
 
@@ -127,7 +134,7 @@
     return {
       sprite: sp,
       x: fromSide ? -40 : rnd() * W,
-      y: initial ? rnd() * H : (fromSide ? rnd() * H * 0.7 : -40),
+      y: initial ? rnd() * worldH : (fromSide ? rnd() * worldH : -40),
       z: z,
       dz: approaching ? -(0.045 + rnd() * 0.05) : 0,
       fall: 20 + rnd() * 15,                    /* px/s at z = 1 */
@@ -152,7 +159,7 @@
 
   function newMote() {
     return {
-      x: rnd() * W, y: rnd() * H,
+      x: rnd() * W, y: rnd() * worldH,
       r: 8 + rnd() * 26,
       vy: -(2 + rnd() * 5),
       swayP: rnd() * 6.283,
@@ -169,7 +176,15 @@
              +  3 * Math.sin(t * 0.47);
   }
 
-  function drawLight(t) {
+  function drawLight(t, sy) {
+    /* Sunlight is anchored near the top of the DOCUMENT (with a gentle
+       0.3 parallax, as befits a distant light source), so scrolling down
+       the page naturally leaves the lit canopy behind. */
+    var off = sy * 0.3;
+    if (off > H * 2.6) return;                  /* fully scrolled past it */
+    ctx.save();
+    ctx.translate(0, -off);
+
     /* warm glow bleeding in from the upper left */
     var breathe = 0.05 + 0.02 * Math.sin(t * 0.06);
     var g = ctx.createRadialGradient(W * 0.12, -H * 0.05, 0,
@@ -177,7 +192,7 @@
     g.addColorStop(0, 'rgba(255,215,150,' + (breathe + 0.05).toFixed(3) + ')');
     g.addColorStop(1, 'rgba(255,215,150,0)');
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillRect(0, 0, W, Math.max(W, H) * 0.8);
 
     /* three faint sun beams slanting through */
     for (var i = 0; i < 3; i++) {
@@ -192,16 +207,18 @@
       lg.addColorStop(0.5, 'rgba(255,225,170,' + a.toFixed(3) + ')');
       lg.addColorStop(1,   'rgba(255,225,170,0)');
       ctx.fillStyle = lg;
-      ctx.fillRect(-w / 2, 0, w, H * 1.7);
+      ctx.fillRect(-w / 2, 0, w, H * 2.3);
       ctx.restore();
     }
+    ctx.restore();
   }
 
   /* ---- main loop ---------------------------------------------------------- */
 
   function step(t, dt) {
+    var sy = window.scrollY || 0;               /* camera position */
     ctx.clearRect(0, 0, W, H);
-    drawLight(t);
+    drawLight(t, sy);
 
     leaves.sort(function (a, b) { return b.z - a.z; });   /* far first */
 
@@ -217,15 +234,18 @@
       f.angle += f.rotV * dt;
       f.flip  += f.flipV * dt;
 
-      if (f.y > H + 50 || f.x < -70 || f.x > W + 70) {
+      if (f.y > worldH + 50 || f.x < -70 || f.x > W + 70) {
         leaves[i] = respawn(f);
         continue;
       }
 
+      var vy = f.y - sy;                        /* world -> screen */
+      if (vy < -120 || vy > H + 120) continue;  /* off-camera: skip draw */
+
       var depthA = Math.min(0.9, Math.max(0.35, 1.25 - 0.4 * f.z));
       ctx.globalAlpha = f.alpha * depthA * f.ramp;
       ctx.save();
-      ctx.translate(f.x, f.y);
+      ctx.translate(f.x, vy);
       ctx.rotate(f.angle);
       /* tumble: squash on one axis to fake a 3D turn */
       ctx.scale(scale * (0.3 + 0.7 * Math.abs(Math.cos(f.flip))), scale);
@@ -239,9 +259,11 @@
       var m = motes[j];
       m.y += m.vy * dt;
       m.x += Math.sin(t * 0.3 + m.swayP) * 4 * dt;
-      if (m.y < -m.r * 2) { motes[j] = newMote(); motes[j].y = H + m.r; continue; }
+      if (m.y < -m.r * 2) { motes[j] = newMote(); motes[j].y = worldH + m.r; continue; }
+      var my = m.y - sy;
+      if (my < -90 || my > H + 90) continue;
       ctx.globalAlpha = m.a * (0.6 + 0.4 * Math.sin(t * m.tw + m.swayP));
-      ctx.drawImage(MOTE, m.x - m.r, m.y - m.r, m.r * 2, m.r * 2);
+      ctx.drawImage(MOTE, m.x - m.r, my - m.r, m.r * 2, m.r * 2);
     }
     ctx.globalAlpha = 1;
   }
@@ -256,6 +278,19 @@
 
   /* ---- setup / housekeeping ----------------------------------------------- */
 
+  function measure() {
+    /* the world is the whole document, not just the first screen */
+    worldH = Math.max(document.documentElement.scrollHeight, window.innerHeight);
+
+    var want = Math.round(Math.min(140, Math.max(14, W * worldH / 42000)));
+    while (leaves.length < want) leaves.push(newLeaf(true));
+    if (leaves.length > want) leaves.length = want;
+
+    var wantM = Math.round(Math.min(26, Math.max(4, W * worldH / 180000)));
+    while (motes.length < wantM) motes.push(newMote());
+    if (motes.length > wantM) motes.length = wantM;
+  }
+
   function resize() {
     W = window.innerWidth;
     H = window.innerHeight;
@@ -263,17 +298,14 @@
     canvas.width = Math.ceil(W * DPR);
     canvas.height = Math.ceil(H * DPR);
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-
-    var want = Math.round(Math.min(32, Math.max(14, W * H / 42000)));
-    while (leaves.length < want) leaves.push(newLeaf(true));
-    if (leaves.length > want) leaves.length = want;
-
-    var wantM = Math.round(Math.min(10, Math.max(4, W * H / 180000)));
-    while (motes.length < wantM) motes.push(newMote());
-    if (motes.length > wantM) motes.length = wantM;
+    measure();
   }
 
   window.addEventListener('resize', resize);
+  if ('ResizeObserver' in window) {
+    /* catch document-height changes (images loading, fonts, etc.) */
+    new ResizeObserver(measure).observe(document.body);
+  }
   document.addEventListener('visibilitychange', function () {
     last = performance.now();                   /* avoid a dt jump on return */
   });
