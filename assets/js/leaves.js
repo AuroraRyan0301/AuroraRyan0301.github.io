@@ -34,6 +34,7 @@
   var DPR = Math.min(window.devicePixelRatio || 1, 2);
   var W = 0, H = 0;          /* viewport (camera) size */
   var worldH = 0;            /* full document height — the leaves' world */
+  var contentL = 0, contentR = 0, hasMargins = false;
   var leaves = [], motes = [];
   var rnd = Math.random;
 
@@ -112,6 +113,15 @@
 
   /* ---- particles --------------------------------------------------------- */
 
+  /* Spawn mostly in the blank side margins, only occasionally over the
+     centered content column; uniform when there are no real margins. */
+  function spawnX() {
+    if (!hasMargins || rnd() < 0.22) return rnd() * W;
+    var ml = contentL, mr = W - contentR;
+    var u = rnd() * (ml + mr);
+    return u < ml ? u : contentR + (u - ml);
+  }
+
   function newLeaf(initial) {
     var approaching = rnd() < 0.18;
     var z = approaching ? 1.7 + rnd() * 0.5 : 0.7 + rnd() * 1.1;
@@ -133,7 +143,7 @@
     var fromSide = !initial && rnd() < 0.25;
     return {
       sprite: sp,
-      x: fromSide ? -40 : rnd() * W,
+      x: fromSide ? -40 : spawnX(),
       y: initial ? rnd() * worldH : (fromSide ? rnd() * worldH : -40),
       z: z,
       dz: approaching ? -(0.045 + rnd() * 0.05) : 0,
@@ -171,7 +181,7 @@
   /* ---- environment ------------------------------------------------------- */
 
   function windX(t, y) {
-    return 6 + 10 * Math.sin(t * 0.11)
+    return 2.5 + 10 * Math.sin(t * 0.11)
              +  5 * Math.sin(t * 0.23 + y * 0.002 + 1.3)
              +  3 * Math.sin(t * 0.47);
   }
@@ -234,6 +244,16 @@
       f.angle += f.rotV * dt;
       f.flip  += f.flipV * dt;
 
+      /* leaves drifting over the text column get nudged back toward the
+         margins and fade a little — the middle stays quiet */
+      var bandFade = 1;
+      if (hasMargins && f.x > contentL && f.x < contentR) {
+        var cx = (contentL + contentR) / 2;
+        var p = 1 - Math.abs(f.x - cx) / ((contentR - contentL) / 2);
+        f.x += (f.x < cx ? -9 : 9) * p * dt;
+        bandFade = 1 - 0.35 * p;
+      }
+
       if (f.y > worldH + 50 || f.x < -70 || f.x > W + 70) {
         leaves[i] = respawn(f);
         continue;
@@ -243,7 +263,7 @@
       if (vy < -120 || vy > H + 120) continue;  /* off-camera: skip draw */
 
       var depthA = Math.min(0.9, Math.max(0.35, 1.25 - 0.4 * f.z));
-      ctx.globalAlpha = f.alpha * depthA * f.ramp;
+      ctx.globalAlpha = f.alpha * depthA * f.ramp * bandFade;
       ctx.save();
       ctx.translate(f.x, vy);
       ctx.rotate(f.angle);
@@ -281,6 +301,18 @@
   function measure() {
     /* the world is the whole document, not just the first screen */
     worldH = Math.max(document.documentElement.scrollHeight, window.innerHeight);
+
+    /* locate the centered content column so leaves can favor the margins */
+    var el = document.querySelector('main.page') || document.querySelector('.page');
+    if (el) {
+      var r = el.getBoundingClientRect();
+      contentL = r.left - 24;
+      contentR = r.right + 24;
+    } else {
+      contentL = W * 0.22;
+      contentR = W * 0.78;
+    }
+    hasMargins = contentL > 90 && W - contentR > 90;
 
     var want = Math.round(Math.min(140, Math.max(14, W * worldH / 42000)));
     while (leaves.length < want) leaves.push(newLeaf(true));
