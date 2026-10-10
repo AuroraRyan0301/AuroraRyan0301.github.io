@@ -197,11 +197,28 @@ html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 .hero__bio p { font-size: 1rem; line-height: 1.7; }
 .hero__bio strong { font-weight: 600; color: var(--color-heading); }
 
-.hero__contact {
+.hero__social {
   margin-top: 1.4rem;
-  font-style: italic;
+  display: flex;
+  gap: 1.1rem;
+  align-items: center;
+}
+
+.hero__social a {
+  display: inline-flex;
   color: var(--color-muted);
-  font-size: 0.95rem;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.hero__social a:hover {
+  color: var(--color-heading);
+  transform: translateY(-2px);
+}
+
+.hero__social svg {
+  width: 1.6rem;
+  height: 1.6rem;
+  fill: currentColor;
 }
 
 .hero__photo {
