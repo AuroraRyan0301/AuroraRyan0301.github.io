@@ -124,6 +124,36 @@ redirect_from:
 
     <article class="pub">
       <div class="pub__thumb">
+        <img src="{{ '/images/edithero_thumb.jpg' | relative_url }}" alt="EditHero teaser: multi-turn part-level edits">
+      </div>
+      <div class="pub__body">
+        <h3 class="pub__title">EditHero: A Benchmark for Long-Horizon Part-Level 3D Editing and Vibe Modeling</h3>
+        <p class="pub__authors">
+          {% include author.html id="ruihan_yu" me=true eq=true %},
+          {% include author.html id="yu_ju_tsai" eq=true %},
+          {% include author.html id="muyao_niu" %},
+          {% include author.html id="runyi_li" %},
+          {% include author.html id="lian_fu" %},
+          {% include author.html id="hanqing_liu" %},
+          {% include author.html id="zheng_hui_huang" %},
+          {% include author.html id="yonghao_yu" %},
+          {% include author.html id="sho_kuno" %},
+          {% include author.html id="ming_hsuan_yang" %},
+          {% include author.html id="kaipeng_zhang" %},
+          {% include author.html id="zhixiang_wang" %}
+        </p>
+        <p class="pub__venue">arXiv preprint, 2026</p>
+        <p class="pub__links">
+          <a href="https://alaya-lab.github.io/EditHero/">project page</a>
+          <a href="https://arxiv.org/abs/2610.02298">arXiv</a>
+          <a href="https://github.com/AlayaLab/EditHero">code</a>
+          <a href="https://huggingface.co/datasets/AlayaLab/EditHero">dataset</a>
+        </p>
+      </div>
+    </article>
+
+    <article class="pub">
+      <div class="pub__thumb">
         <img src="{{ '/images/gwr_thumb.png' | relative_url }}" alt="Generative World Renderer — Ours visual condition (snowy weather)">
       </div>
       <div class="pub__body">
