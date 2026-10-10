@@ -25,9 +25,11 @@ redirect_from:
         <p>
           I am fortunate to collaborate with Prof.
           <a href="http://xufeng.site/"><strong>Feng Xu</strong></a>
-          (Tsinghua University) and Prof.
+          (Tsinghua University), Prof.
           <a href="https://shuangz.com/"><strong>Shuang Zhao</strong></a>
-          (University of Illinois Urbana-Champaign), and to have had a
+          (University of Illinois Urbana-Champaign), and Prof.
+          <a href="https://faculty.ucmerced.edu/mhyang/"><strong>Ming-Hsuan Yang</strong></a>
+          (University of California, Merced), and to have had a
           wonderful internship under Prof.
           <a href="https://www.haosu.ai/"><strong>Hao Su</strong></a>
           at UC San Diego.
@@ -54,7 +56,7 @@ redirect_from:
         <a href="https://github.com/AuroraRyan0301" title="GitHub" aria-label="GitHub">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.8 23.4c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.7-.3-5.5-1.3-5.5-6 0-1.2.5-2.3 1.3-3.1-.2-.4-.6-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0C17.3 4.7 18.3 5 18.3 5c.7 1.6.2 2.9.1 3.2.8.8 1.3 1.9 1.3 3.1 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3"/></svg>
         </a>
-        <a href="https://scholar.google.com/citations?user=PS_CX0AAAAAJ" title="Google Scholar" aria-label="Google Scholar">
+        <a href="https://scholar.google.com/citations?user=4G3y0ZoAAAAJ" title="Google Scholar" aria-label="Google Scholar">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.242 13.769 0 9.5 12 0l12 9.5-5.242 4.269C17.548 11.249 14.978 9.5 12 9.5c-2.977 0-5.548 1.748-6.758 4.269zM12 10a7 7 0 1 0 0 14 7 7 0 0 0 0-14z"/></svg>
         </a>
       </div>
